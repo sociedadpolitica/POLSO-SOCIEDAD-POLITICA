@@ -1,0 +1,49 @@
+<%- include('partials/head') %>
+<div class="progress" data-progress></div>
+<article class="story">
+  <header class="story__head wrap-narrow">
+    <p class="kicker"><span><%= a.kind %></span> · <%= a.section %></p>
+    <h1 class="story__title"><%= a.title %></h1>
+    <% if (a.excerpt) { %><p class="story__dek"><%= a.excerpt %></p><% } %>
+    <div class="story__meta">
+      <a class="author" href="<%= a.author_slug ? '/equipo/' + a.author_slug : '/equipo' %>">
+        <% if (a.author_photo) { %><img src="<%= a.author_photo %>" alt=""><% } else { %><span class="author__ph"><%= (a.author_name || 'P')[0] %></span><% } %>
+        <span><strong><%= a.author_name || 'Redacción POLSO' %></strong><small><%= [a.author_profession || a.author_role, a.author_workplace].filter(Boolean).join(' · ') %></small></span>
+      </a>
+      <span class="mono muted"><%= fmtDate(a.published_at) %> · <%= readingTime(a.body) %> min de lectura</span>
+    </div>
+  </header>
+  <% if (a.cover) { %><figure class="story__cover wrap"><img src="<%= a.cover %>" alt=""></figure><% } %>
+  <div class="story__body wrap-narrow prose"><%- html %></div>
+  <% if (a.author_name) { %>
+  <aside class="wrap-narrow">
+    <div class="bio-card">
+      <div class="bio-card__img"><% if (a.author_photo) { %><img src="<%= a.author_photo %>" alt="<%= a.author_name %>"><% } else { %><span><%= a.author_name.split(' ').map(w => w[0]).slice(0, 2).join('') %></span><% } %></div>
+      <div>
+        <p class="eyebrow">Sobre el autor</p>
+        <h3><%= a.author_name %></h3>
+        <% if (a.author_profession) { %><p class="bio-card__prof"><%= a.author_profession %></p><% } %>
+        <% if (a.author_workplace) { %><p class="bio-card__work"><%= a.author_workplace %></p><% } %>
+        <% if (a.author_studies) { %><ul class="bio-card__studies"><% a.author_studies.split('\n').filter(s => s.trim()).forEach(s => { %><li><%= s.trim() %></li><% }) %></ul><% } %>
+        <% if (a.author_slug) { %><a class="link-arrow" href="/equipo/<%= a.author_slug %>">Ver perfil ›</a><% } %>
+      </div>
+    </div>
+  </aside>
+  <% } %>
+  <% if (site.disclaimer) { %>
+  <aside class="wrap-narrow"><p class="disclaimer"><strong>Aviso:</strong> <%= site.disclaimer %></p></aside>
+  <% } %>
+  <footer class="wrap-narrow story__share">
+    <span class="mono">Compartir</span>
+    <button class="chip" data-share>Copiar enlace / compartir</button>
+    <a class="chip" target="_blank" rel="noopener" href="https://wa.me/?text=<%= encodeURIComponent(a.title) %>%20" data-wa>WhatsApp</a>
+    <a class="chip" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=<%= encodeURIComponent(a.title) %>" data-x>X</a>
+  </footer>
+</article>
+<% if (related.length) { %>
+<section class="wrap section">
+  <header class="section__head"><h2 class="section__title">Sigue leyendo</h2></header>
+  <div class="grid"><% related.forEach(r => { %><%- include('partials/card', { a: r }) %><% }) %></div>
+</section>
+<% } %>
+<%- include('partials/foot') %>

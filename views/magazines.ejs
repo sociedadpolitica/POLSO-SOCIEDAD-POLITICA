@@ -1,0 +1,19 @@
+<%- include('partials/head') %>
+<section class="wrap page-head">
+  <p class="eyebrow">Hemeroteca</p>
+  <h1 class="page-title">Revistas</h1>
+</section>
+<section class="wrap section">
+  <% if (magazines.length) { %>
+  <div class="shelf shelf--grid">
+    <% magazines.forEach(m => { %>
+      <a class="mag" href="<%= m.link || '#' %>" <%= m.link ? 'target=_blank rel=noopener' : '' %>>
+        <div class="mag__cover"><% if (m.cover) { %><img src="<%= m.cover %>" alt="Portada <%= m.title %>" loading="lazy"><% } else { %><span><%= m.edition %></span><% } %></div>
+        <p class="mono">Ed. <%= m.edition %> · <%= fmtDate(m.published_at) %></p><strong><%= m.title %></strong>
+        <% if (m.description) { %><small><%= m.description %></small><% } %>
+      </a>
+    <% }) %>
+  </div>
+  <% } else { %><div class="empty">Próximamente: revista <%= site.edition %>.</div><% } %>
+</section>
+<%- include('partials/foot') %>

@@ -1,0 +1,23 @@
+<%- include('partials/head') %>
+<section class="wrap profile">
+  <div class="profile__img reveal"><% if (m.photo) { %><img src="<%= m.photo %>" alt="<%= m.name %>"><% } else { %><span><%= m.name.split(' ').map(w => w[0]).slice(0, 2).join('') %></span><% } %></div>
+  <div class="reveal">
+    <p class="eyebrow"><%= m.area %></p>
+    <h1 class="page-title"><%= m.name %></h1>
+    <p class="profile__role"><%= m.role %></p>
+    <% if (m.profession || m.workplace) { %><p class="profile__prof"><%= [m.profession, m.workplace].filter(Boolean).join(' · ') %></p><% } %>
+    <% if (m.studies) { %><ul class="bio-card__studies"><% m.studies.split('\n').filter(s => s.trim()).forEach(s => { %><li><%= s.trim() %></li><% }) %></ul><% } %>
+    <% if (m.bio) { %><p class="page-dek"><%= m.bio %></p><% } %>
+    <div class="hero__cta">
+      <% if (m.instagram) { %><a class="btn" href="<%= m.instagram %>" target="_blank" rel="noopener">Instagram</a><% } %>
+      <a class="btn btn--ghost" href="/equipo#<%= slug(m.area || '') %>">‹ Volver al equipo</a>
+    </div>
+  </div>
+</section>
+<% if (articles.length) { %>
+<section class="wrap section">
+  <header class="section__head"><p class="eyebrow">Firma</p><h2 class="section__title">Publicaciones.</h2></header>
+  <div class="grid"><% articles.forEach(a => { %><%- include('partials/card', { a }) %><% }) %></div>
+</section>
+<% } %>
+<%- include('partials/foot') %>

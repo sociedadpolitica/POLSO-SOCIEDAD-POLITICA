@@ -1,0 +1,20 @@
+<% if (site.radio_url || site.radio_stream) { %>
+<section class="radio<%= radio.live ? ' is-live' : '' %>" data-radio>
+  <div class="wrap radio__inner">
+    <% if (site.radio_stream) { %>
+      <button class="radio__play" type="button" data-radio-play aria-label="Escuchar <%= site.radio_station %> en vivo">
+        <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>
+        <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z" fill="currentColor"/></svg>
+        <span class="i-load" aria-hidden="true"></span>
+      </button>
+      <audio preload="none" data-src="<%= site.radio_stream %>"></audio>
+    <% } %>
+    <div class="radio__text">
+      <p class="radio__badge"><span class="radio__bars" aria-hidden="true"><% for (let i = 0; i < 4; i++) { %><i style="--i:<%= i %>"></i><% } %></span><span data-radio-label><%= radio.live ? 'En vivo ahora' : 'Radio' %></span></p>
+      <h2><%= site.radio_name %></h2>
+      <p><%= radio.schedule %> · <%= site.radio_station %></p>
+    </div>
+    <% if (site.radio_url) { %><a class="btn radio__btn" href="<%= site.radio_url %>" target="_blank" rel="noopener">Ir a <%= site.radio_station %> ↗</a><% } %>
+  </div>
+</section>
+<% } %>

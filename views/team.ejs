@@ -1,0 +1,41 @@
+<%- include('partials/head') %>
+<section class="page-hero page-hero--photo">
+  <div class="wrap page-hero__text">
+    <p class="eyebrow eyebrow--yellow">Temporada <%= site.edition %> · <%= total %> integrantes</p>
+    <h1 class="page-title">Esto es Polso.</h1>
+    <p class="page-dek">Un equipo. Diferentes talentos. Un mismo propósito.</p>
+  </div>
+  <div class="page-hero__media">
+    <img src="<%= site.hero_image || '/static/img/equipo-xiv-foto.jpg' %>" alt="Equipo POLSO Temporada <%= site.edition %>">
+  </div>
+</section>
+<nav class="wrap chips chips--sticky" aria-label="Áreas">
+  <% groups.forEach(g => { %><a href="#<%= slug(g.area) %>" class="chip"><%= g.area %> <small><%= g.members.length %></small></a><% }) %>
+</nav>
+<% groups.forEach(g => { if (g.area === 'Docente') { %>
+<section class="wrap section area-block" id="<%= slug(g.area) %>">
+  <% g.members.forEach(m => { %>
+  <a class="lead-member reveal" href="/equipo/<%= m.slug %>">
+    <div class="lead-member__img"><% if (m.photo) { %><img src="<%= m.photo %>" alt="<%= m.name %>"><% } %></div>
+    <div class="lead-member__text">
+      <p class="eyebrow">Docente · Líder del proyecto</p>
+      <h2><%= m.name %></h2>
+      <% if (m.profession || m.workplace) { %><p class="lead-member__prof"><%= [m.profession, m.workplace].filter(Boolean).join(' · ') %></p><% } %>
+      <p><%= m.bio || 'Acompaña y orienta académicamente a POLSO Sociedad Política desde el programa de Comunicación Social de la UFPSO.' %></p>
+      <span class="link-arrow">Ver perfil ›</span>
+    </div>
+  </a>
+  <% }) %>
+</section>
+<% return; } %>
+<section class="wrap section area-block" id="<%= slug(g.area) %>">
+  <header class="area-block__head reveal">
+    <span class="area__icon"><%= g.icon %></span>
+    <div><h2 class="section__title"><%= g.area %></h2><p><%= g.text %></p></div>
+  </header>
+  <div class="faces">
+    <% g.members.forEach(m => { %><div class="reveal"><%- include('partials/face', { m }) %></div><% }) %>
+  </div>
+</section>
+<% }) %>
+<%- include('partials/foot') %>

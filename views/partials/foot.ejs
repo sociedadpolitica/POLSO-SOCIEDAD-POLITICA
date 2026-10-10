@@ -1,0 +1,32 @@
+</main>
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <img src="/static/img/logo-polso.png" alt="Logo POLSO Sociedad Política UFPSO" width="120" height="119" loading="lazy">
+        <div>
+          <p class="footer__tag"><%= site.tagline %>.</p>
+          <p class="footer__sub">Temporada <%= site.edition %> · UFPSO · <%= site.location %></p>
+        </div>
+      </div>
+      <div class="footer__cols">
+        <div><h4>Explorar</h4><a href="/publicaciones">Publicaciones</a><a href="/publicaciones?tipo=columna">Columnas</a><a href="/revistas">Revistas</a><a href="/podcast">Podcast</a><a href="/equipo">Equipo</a></div>
+        <div><h4>Síguenos</h4>
+          <% if (site.instagram_url) { %><a href="<%= site.instagram_url %>" target="_blank" rel="noopener">Instagram</a><% } %>
+          <% if (site.facebook_url) { %><a href="<%= site.facebook_url %>" target="_blank" rel="noopener">Facebook</a><% } %>
+          <% if (site.youtube_url) { %><a href="<%= site.youtube_url %>" target="_blank" rel="noopener">YouTube</a><% } %>
+          <% if (site.spotify_url) { %><a href="<%= site.spotify_url %>" target="_blank" rel="noopener">Spotify</a><% } %>
+        </div>
+        <div><h4>Contacto</h4><a href="mailto:<%= site.email %>"><%= site.email %></a>
+          <% if (site.ufpso_url) { %><a href="<%= site.ufpso_url %>" target="_blank" rel="noopener">Comunicación Social · UFPSO</a><% } %></div>
+      </div>
+    </div>
+    <div class="footer__base">
+      <span>© <%= new Date().getFullYear() %> POLSO Sociedad Política</span>
+      <a href="/admin">Acceso editorial</a>
+    </div>
+  </div>
+</footer>
+<script src="/static/js/site.js?v=<%= v %>" defer></script>
+</body>
+</html>

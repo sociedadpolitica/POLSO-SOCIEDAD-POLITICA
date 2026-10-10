@@ -1,0 +1,23 @@
+<% const nav = [['/', 'Inicio'], ['/publicaciones', 'Publicaciones'], ['/equipo', 'Equipo'], ['/revistas', 'Revistas'], ['/podcast', 'Podcast']]; %>
+<header class="nav-wrap" data-masthead>
+  <div class="navbar">
+    <a href="/" class="brand" aria-label="POLSO, inicio">
+      <img src="/static/img/logo-polso-sm.png" alt="" width="36" height="36">
+      <span class="brand__name">Polso<small>Sociedad Política</small></span>
+    </a>
+    <nav class="nav" id="nav" aria-label="Principal">
+      <% nav.forEach(([href, label]) => { const on = href === '/' ? path === '/' : path.startsWith(href); %>
+        <a href="<%= href %>" class="nav__link<%= on ? ' is-active' : '' %>"><%= label %></a>
+      <% }) %>
+      <div class="nav__extra">
+        <% if (site.instagram_url) { %><a href="<%= site.instagram_url %>" target="_blank" rel="noopener">Instagram</a><% } %>
+        <% if (site.facebook_url) { %><a href="<%= site.facebook_url %>" target="_blank" rel="noopener">Facebook</a><% } %>
+        <% if (site.youtube_url) { %><a href="<%= site.youtube_url %>" target="_blank" rel="noopener">YouTube</a><% } %>
+        <% if (site.ufpso_url) { %><a href="<%= site.ufpso_url %>" target="_blank" rel="noopener">UFPSO</a><% } %>
+        <a href="mailto:<%= site.email %>">Escríbenos</a>
+      </div>
+    </nav>
+    <span class="season-pill">Temporada <%= site.edition %></span>
+    <button class="burger" aria-controls="nav" aria-expanded="false" aria-label="Abrir menú" data-burger><span></span><span></span></button>
+  </div>
+</header>

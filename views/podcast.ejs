@@ -1,0 +1,21 @@
+<%- include('partials/head') %>
+<%- include('partials/radio') %>
+<section class="wrap page-head">
+  <p class="eyebrow">Audio</p>
+  <h1 class="page-title">Podcast POLSO</h1>
+</section>
+<section class="wrap section episodes">
+  <% if (episodes.length) { episodes.forEach(e => { const src = embedUrl(e.link); %>
+    <article class="episode">
+      <div class="episode__n mono">EP <%= e.number || '—' %></div>
+      <div>
+        <p class="mono muted"><%= fmtDate(e.published_at) %></p>
+        <h2><%= e.title %></h2>
+        <% if (e.description) { %><p><%= e.description %></p><% } %>
+        <% if (src) { %><iframe src="<%= src %>" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" title="<%= e.title %>"></iframe>
+        <% } else if (e.link) { %><a class="btn" href="<%= e.link %>" target="_blank" rel="noopener">Escuchar ▶</a><% } %>
+      </div>
+    </article>
+  <% }) } else { %><div class="empty">Pronto, nuevos episodios.</div><% } %>
+</section>
+<%- include('partials/foot') %>

@@ -1,0 +1,15 @@
+<%- include('partials/head') %>
+<section class="wrap page-head">
+  <p class="eyebrow">Archivo editorial</p>
+  <h1 class="page-title">Publicaciones</h1>
+  <div class="chips">
+    <a href="/publicaciones" class="chip<%= !kind ? ' is-on' : '' %>">Todo</a>
+    <% kinds.forEach(k => { %><a href="/publicaciones?tipo=<%= encodeURIComponent(k) %>" class="chip<%= kind === k ? ' is-on' : '' %>"><%= k %></a><% }) %>
+  </div>
+</section>
+<section class="wrap section">
+  <% if (articles.length) { %>
+    <div class="grid"><% articles.forEach(a => { %><%- include('partials/card', { a }) %><% }) %></div>
+  <% } else { %><div class="empty">Aún no hay publicaciones en esta categoría.</div><% } %>
+</section>
+<%- include('partials/foot') %>

@@ -1,0 +1,164 @@
+<%- include('partials/head') %>
+
+<section class="hero">
+  <div class="hero__content wrap">
+    <p class="hero__eyebrow">Temporada <%= site.edition %> · UFPSO Ocaña</p>
+    <h1 class="hero__title">Liderando<br> desde la <em>opinión.</em></h1>
+    <p class="hero__lede">Análisis, debate y periodismo universitario sobre sociedad política, desarrollo sostenible y políticas públicas.</p>
+    <div class="hero__cta">
+      <a href="/publicaciones" class="btn btn--yellow">Leer lo último</a>
+      <a href="/equipo" class="btn btn--glass">Conoce al equipo <span aria-hidden="true">›</span></a>
+    </div>
+  </div>
+  <div class="hero__media">
+    <img src="<%= (!site.hero_image || site.hero_image === '/static/img/equipo-xiv-foto.jpg') ? '/static/img/equipo-xiv-foto-portada.jpg' : site.hero_image %>" alt="Equipo POLSO Temporada <%= site.edition %>" fetchpriority="high">
+  </div>
+</section>
+
+<%- include('partials/radio') %>
+
+<% if (lead) { %>
+<section class="latest" id="ultimo"><div class="wrap">
+  <header class="section__head reveal"><p class="eyebrow">Lo último</p><h2 class="section__title">Lo que estamos pensando.</h2></header>
+  <div class="feature">
+    <a class="feature__lead reveal" href="/publicaciones/<%= lead.slug %>">
+      <figure class="<%= lead.cover ? '' : 'is-author' %>"><% if (lead.cover || lead.author_photo) { %><img src="<%= lead.cover || lead.author_photo %>" alt=""><% } else { %><div class="feature__ph"><img src="/static/img/logo-polso.png" alt=""></div><% } %></figure>
+      <div class="feature__text">
+        <span class="tag tag--solid"><%= lead.kind %></span>
+        <h3><%= lead.title %></h3>
+        <% if (lead.excerpt) { %><p><%= lead.excerpt %></p><% } %>
+        <div class="author">
+          <% if (lead.author_photo) { %><img src="<%= lead.author_photo %>" alt=""><% } else { %><span class="author__ph"><%= (lead.author_name || 'P')[0] %></span><% } %>
+          <span><strong><%= lead.author_name || 'Redacción POLSO' %></strong><small><%= fmtDate(lead.published_at) %> · <%= readingTime(lead.body) %> min</small></span>
+        </div>
+      </div>
+    </a>
+    <div class="feature__list">
+      <% secondary.concat(more).slice(0, 4).forEach((a, i) => { %>
+        <a class="mini reveal" href="/publicaciones/<%= a.slug %>" style="--d:<%= i * 70 %>ms">
+          <span class="mini__n"><%= String(i + 1).padStart(2, '0') %></span>
+          <span><span class="eyebrow"><%= a.kind %></span><strong><%= a.title %></strong><small><%= a.author_name || 'Redacción' %></small></span>
+        </a>
+      <% }) %>
+      <% if (!secondary.length) { %>
+        <div class="mini mini--empty"><span class="mini__n">＋</span><span><strong>Muy pronto, más análisis.</strong><small>La redacción de la Temporada <%= site.edition %> está escribiendo.</small></span></div>
+      <% } %>
+      <a href="/publicaciones" class="link-arrow">Todas las publicaciones ›</a>
+    </div>
+  </div>
+</div></section>
+<% } %>
+
+<section class="about">
+  <div class="wrap about__grid">
+    <div class="about__logo reveal"><img src="/static/img/logo-polso.png" alt="Logo POLSO" loading="lazy"></div>
+    <div class="reveal">
+      <p class="eyebrow eyebrow--yellow">Quiénes somos</p>
+      <h2 class="about__title">Un equipo. Diferentes talentos. <em>Un mismo propósito.</em></h2>
+      <p class="about__text"><%= site.about %></p>
+      <dl class="stats">
+        <div><dt><%= team.length %></dt><dd>integrantes</dd></div>
+        <div><dt><%= areas.length %></dt><dd>áreas</dd></div>
+        <div><dt><%= site.edition %></dt><dd>temporadas</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<% if (areas.length) { %>
+<section class="wrap section">
+  <header class="section__head reveal"><p class="eyebrow">Detrás de cada historia</p><h2 class="section__title">Nuestras áreas.</h2></header>
+  <div class="areas">
+    <% areas.forEach((g, i) => { %>
+      <a class="area reveal" href="/equipo#<%= slug(g.area) %>" style="--d:<%= i * 60 %>ms">
+        <div class="area__faces">
+          <% g.members.slice(0, 4).forEach(m => { %><img src="<%= m.photo %>" alt="" loading="lazy"><% }) %>
+          <% if (g.members.length > 4) { %><span>+<%= g.members.length - 4 %></span><% } %>
+        </div>
+        <span class="area__icon"><%= g.icon %></span>
+        <h3><%= g.area %></h3>
+        <p><%= g.text %></p>
+        <small><%= g.members.length %> <%= g.members.length === 1 ? 'integrante' : 'integrantes' %> ›</small>
+      </a>
+    <% }) %>
+  </div>
+</section>
+<% } %>
+
+<% if (site.quote) { %>
+<section class="quote">
+  <blockquote class="wrap reveal">
+    <p>“<%= site.quote %>”</p>
+    <cite><%= site.quote_author %></cite>
+  </blockquote>
+</section>
+<% } %>
+
+<section class="wrap section">
+  <div class="duo">
+    <div class="panel reveal">
+      <header class="panel__head"><div><p class="eyebrow">Revistas</p><h2>Para leer con calma.</h2></div><a href="/revistas" class="link-arrow">Archivo ›</a></header>
+      <% if (magazines.length) { %>
+        <div class="shelf">
+          <% magazines.forEach(m => { %>
+            <a class="mag" href="<%= m.link || '/revistas' %>" <%= m.link ? 'target=_blank rel=noopener' : '' %>>
+              <div class="mag__cover"><% if (m.cover) { %><img src="<%= m.cover %>" alt="Portada <%= m.title %>" loading="lazy"><% } else { %><span><%= m.edition %></span><% } %></div>
+              <strong><%= m.title %></strong><small>Edición <%= m.edition %></small>
+            </a>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <div class="soon"><div class="soon__mag"><span>XIV</span></div><p>La revista de la Temporada <%= site.edition %> está en producción.</p></div>
+      <% } %>
+    </div>
+
+    <div class="panel panel--navy reveal">
+      <header class="panel__head"><div><p class="eyebrow eyebrow--yellow">Podcast</p><h2>Escúchanos.</h2></div><a href="/podcast" class="link-arrow">Episodios ›</a></header>
+      <% if (episode) { const src = embedUrl(episode.link); %>
+        <p class="ep-label">Episodio <%= episode.number || '' %></p>
+        <h3 class="ep-title"><%= episode.title %></h3>
+        <% if (src) { %><iframe class="player" src="<%= src %>" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" title="<%= episode.title %>"></iframe>
+        <% } else if (episode.link) { %><a class="btn btn--yellow" href="<%= episode.link %>" target="_blank" rel="noopener">Escuchar ▶</a><% } %>
+      <% } else { %>
+        <div class="wave" aria-hidden="true"><% for (let i = 0; i < 32; i++) { %><i style="--i:<%= i %>"></i><% } %></div>
+        <p class="soon__text">Micrófonos encendidos. Muy pronto, nuevos episodios.</p>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<section class="social">
+  <div class="wrap social__grid">
+    <div class="social__intro reveal">
+      <p class="eyebrow eyebrow--yellow">En redes · ahora mismo</p>
+      <h2 class="social__title">La conversación sigue en <em>@polso_oficial</em>.</h2>
+      <p>Lo último que publicamos en Instagram, siempre actualizado aquí.</p>
+      <div class="hero__cta">
+        <% if (site.instagram_url) { %><a class="btn btn--yellow" href="<%= site.instagram_url %>" target="_blank" rel="noopener">Seguir en Instagram</a><% } %>
+        <% if (site.facebook_url) { %><a class="btn btn--glass" href="<%= site.facebook_url %>" target="_blank" rel="noopener">Facebook</a><% } %>
+        <% if (site.youtube_url) { %><a class="btn btn--glass" href="<%= site.youtube_url %>" target="_blank" rel="noopener">YouTube</a><% } %>
+      </div>
+    </div>
+    <div class="phone reveal">
+      <div class="phone__screen">
+        <div class="ig__head"><img src="/static/img/logo-polso-sm.png" alt=""><strong>polso_oficial</strong><span>Último post</span></div>
+        <% if (instagram && instagram.mode === 'api') { %>
+          <a href="<%= instagram.permalink %>" target="_blank" rel="noopener" class="ig__media"><img src="<%= instagram.image %>" alt="Último post de Instagram de POLSO" loading="lazy"><% if (instagram.isVideo) { %><span class="ig__play">▶</span><% } %></a>
+          <p class="ig__caption"><strong>polso_oficial</strong> <%= instagram.caption.slice(0, 180) %><%= instagram.caption.length > 180 ? '…' : '' %></p>
+          <p class="ig__date"><%= fmtDate(instagram.date) %></p>
+        <% } else if (instagram && instagram.mode === 'embed') { %>
+          <div class="ig__embed">
+            <blockquote class="instagram-media" data-instgrm-permalink="<%= instagram.permalink %>" data-instgrm-version="14" style="margin:0;width:100%;min-width:0;border:0;box-shadow:none"></blockquote>
+          </div>
+          <script async src="https://www.instagram.com/embed.js"></script>
+        <% } else { %>
+          <a href="<%= site.instagram_url %>" target="_blank" rel="noopener" class="ig__media ig__media--brand"><img src="/static/img/logo-polso.png" alt=""></a>
+          <p class="ig__caption"><strong>polso_oficial</strong> Te presentamos al equipo de Polso y las áreas que están detrás de cada contenido. 💙</p>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<%- include('partials/foot') %>

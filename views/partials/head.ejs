@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title><%= title ? `${title} · POLSO` : `POLSO Sociedad Política · Temporada ${site.edition}` %></title>
+  <meta name="description" content="<%= (typeof description !== 'undefined' && description) || site.about %>">
+  <meta property="og:title" content="<%= title || 'POLSO Sociedad Política' %>">
+  <meta property="og:description" content="<%= (typeof description !== 'undefined' && description) || site.tagline %>">
+  <meta property="og:image" content="<%= (typeof image !== 'undefined' && image) || site.hero_image || '/static/img/logo-polso.png' %>">
+  <meta name="theme-color" content="#022049">
+  <link rel="icon" href="/static/img/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/static/img/logo-polso-sm.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/site.css?v=<%= v %>">
+</head>
+<body class="<%= locals.hasHero ? 'has-hero' : '' %>">
+<a class="skip" href="#main">Saltar al contenido</a>
+<%- include('header') %>
+<main id="main">

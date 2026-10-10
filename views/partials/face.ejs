@@ -1,0 +1,4 @@
+<a class="face" href="/equipo/<%= m.slug %>">
+  <div class="face__img"><% if (m.photo) { %><img src="<%= m.photo %>" alt="<%= m.name %>" loading="lazy"><% } else { %><span><%= m.name.split(' ').map(w => w[0]).slice(0, 2).join('') %></span><% } %></div>
+  <strong><%= m.name %></strong><small><%= m.role || m.area %></small>
+</a>
