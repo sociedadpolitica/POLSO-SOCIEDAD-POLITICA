@@ -45,7 +45,7 @@ export async function saveSettings(values) {
 
 const SQL_TYPES = { number: 'INTEGER', checkbox: 'INTEGER', relation: 'INTEGER' };
 
-/** Crea/migra las tablas a partir del esquema y siembra el contenido inicial. */
+/** Crea/migra las tablas a partir del esquema declarativo. */
 async function migrate() {
   for (const [table, def] of Object.entries(resources)) {
     await client.execute(`CREATE TABLE IF NOT EXISTS ${table} (
@@ -62,28 +62,25 @@ async function migrate() {
   }
   await client.execute('CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT)');
 
-  // Migraciones de datos anteriores
-  await db.run("UPDATE members SET area = 'Docente', role = 'Docente' WHERE area = 'Docencia y asesoría'");
-  await db.run("UPDATE members SET position = 0 WHERE area = 'Docente'");
-  // Se retiró el equipo de ejemplo (fotos recortadas de la foto grupal); el equipo real se carga desde el panel
-  await db.run("DELETE FROM members WHERE photo LIKE '/static/img/equipo/%'");
-  // Una sola vez: vaciar el equipo para cargar el de la nueva temporada desde cero
-  if ((await db.run("INSERT INTO settings (key, value) VALUES ('_members_cleared', datetime('now')) ON CONFLICT(key) DO NOTHING")).changes) {
+  // Tareas de mantenimiento que se ejecutan una sola vez por base de datos
+  await once('_members_cleared', async () => {
+    // Se vació el equipo de ejemplo para cargar el de la nueva temporada desde el panel
     await db.run('DELETE FROM members');
-  }
-  await db.run('UPDATE articles SET author_id = NULL WHERE author_id IS NOT NULL AND author_id NOT IN (SELECT id FROM members)');
+    await db.run('UPDATE articles SET author_id = NULL');
+  });
+  await once('_images_optimized', async () => {
+    // Comprime a WebP las imágenes subidas antes de que existiera la compresión automática
+    const { optimizeExistingImages } = await import('./services/optimize-images.js');
+    const r = await optimizeExistingImages(() => {}, { waitForDb: false });
+    console.log(`[imágenes] ${r.images} optimizadas: ${r.beforeKB} KB → ${r.afterKB} KB`);
+  });
+}
 
-  // Una sola vez: comprimir las imágenes subidas antes de que existiera la compresión automática
-  const claim = await db.run("INSERT INTO settings (key, value) VALUES ('_images_optimized', datetime('now')) ON CONFLICT(key) DO NOTHING");
-  if (claim.changes) {
-    try {
-      const { optimizeExistingImages } = await import('./services/optimize-images.js');
-      const r = await optimizeExistingImages(() => {}, { waitForDb: false });
-      console.log(`[imágenes] ${r.images} optimizadas: ${r.beforeKB} KB → ${r.afterKB} KB`);
-    } catch (e) {
-      console.error('[imágenes] no se pudo optimizar', e); // el sitio sigue funcionando igual
-    }
-  }
+/** Ejecuta `task` solo la primera vez (la marca queda en settings). Si falla, el sitio sigue funcionando. */
+async function once(key, task) {
+  const claim = await db.run("INSERT INTO settings (key, value) VALUES (?, datetime('now')) ON CONFLICT(key) DO NOTHING", key);
+  if (!claim.changes) return;
+  try { await task(); } catch (e) { console.error(`[${key}]`, e); }
 }
 
 // Promesa única: las rutas esperan a que la base esté lista (importante en serverless)

@@ -8,7 +8,7 @@
         "includeFiles": [
           "views/**",
           "public/**",
-          "scripts/wix-excerpts.json"
+          "src/data/**"
         ]
       }
     }

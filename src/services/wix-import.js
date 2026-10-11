@@ -11,7 +11,7 @@ import { saveImage } from '../storage.js';
 
 const BASE = 'https://polsosp.wixsite.com/polso';
 // Entradillas escritas a mano para las columnas importadas (título → resumen)
-const EXCERPTS = JSON.parse(await readFile(new URL('../../scripts/wix-excerpts.json', import.meta.url), 'utf8'));
+const EXCERPTS = JSON.parse(await readFile(new URL('../data/wix-excerpts.json', import.meta.url), 'utf8'));
 const MONTHS = { ene: 1, enero: 1, feb: 2, febrero: 2, mar: 3, marzo: 3, abr: 4, abril: 4, may: 5, mayo: 5, jun: 6, junio: 6,
   jul: 7, julio: 7, ago: 8, agosto: 8, sep: 9, sept: 9, septiembre: 9, oct: 10, octubre: 10, nov: 11, noviembre: 11, dic: 12, diciembre: 12 };
 // Páginas del sitemap que no son columnas

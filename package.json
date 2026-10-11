@@ -10,8 +10,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "import:wix": "node scripts/import-wix.js",
-    "push:cloud": "node scripts/push-to-cloud.js"
+    "import:wix": "node scripts/import-wix.js"
   },
   "dependencies": {
     "@libsql/client": "^0.15.15",

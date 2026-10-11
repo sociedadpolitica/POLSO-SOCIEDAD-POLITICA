@@ -1,67 +1,69 @@
-# POLSO · Sociedad Política — XIV Edición
+# POLSO · Sociedad Política — Temporada XIV
 
-Sitio web del medio POLSO (Ocaña, Norte de Santander) con panel de redacción integrado. Se adapta a web y móvil.
+Sitio web del medio universitario POLSO (UFPSO, Ocaña), con panel de redacción integrado.
+En producción: **https://www.polso.digital** · Panel: **/admin**
 
-## Arranque
+## Desarrollo local
 
 ```bash
-cp .env.example .env   # cambia ADMIN_PASSWORD y SESSION_SECRET
 npm install
-npm start              # http://localhost:3000  ·  panel: /admin
+cp .env.example .env   # opcional en local
+npm run dev            # http://localhost:3000  ·  panel: /admin (admin / polso2026)
 ```
 
-Requiere Node ≥ 22.13 (usa SQLite nativo `node:sqlite`, sin servicios externos).
+Requiere Node ≥ 20. En local se usa el archivo `data/polso.db` (SQLite) y la carpeta `uploads/`; no hace falta ningún servicio externo.
 
-## Qué incluye
-
-- **Sitio público** (renderizado en servidor, bueno para SEO): portada editorial, publicaciones con filtros, artículo con barra de progreso y botones para compartir, equipo con perfiles, revistas, podcast con reproductor de Spotify/YouTube y bloque de **último post de Instagram**.
-- **Panel `/admin`**: inicio con métricas, crear/editar/eliminar publicaciones, equipo, revistas y episodios. Las fotos se suben arrastrándolas, el editor de texto tiene vista previa y el diseño de ajustes es claro. En el móvil funciona como una app, con una barra inferior.
-
-## Instagram en vivo
-
-En **Admin → Ajustes → Instagram en vivo**:
-1. **Automático:** pega un token de Instagram Graph API (requiere cuenta Business o Creator). El último post se actualiza solo y se guarda en caché durante 15 minutos.
-2. **Manual:** pega el enlace del último post y se muestra con el embed oficial.
+| Comando | Qué hace |
+|---|---|
+| `npm run dev` | Servidor con recarga automática |
+| `npm start` | Servidor normal |
+| `npm run import:wix` | Trae columnas, revistas y podcast del sitio anterior en Wix (no duplica) |
 
 ## Estructura
 
 ```
-server.js                 Arranque de Express
-src/resources.js          Esquema del contenido: define la BD, la API y los formularios del panel
-src/db.js                 SQLite, migraciones automáticas y ajustes
-src/auth.js               Sesión firmada (HMAC) y límite de intentos de login
-src/routes/public.js      Páginas públicas
-src/routes/admin-api.js   API REST del panel y subida de imágenes
-src/services/instagram.js Último post de Instagram
-views/                    Plantillas EJS
-public/css, public/js     Estilos e interacciones del sitio
-public/admin/             Panel de redacción (SPA sin dependencias)
-data/, uploads/           Base de datos e imágenes (fuera de git)
+server.js                     Arranque de Express (en Vercel se exporta como función)
+vercel.json                   Configuración del despliegue
+src/
+  config.js                   Variables de entorno y bloqueo de credenciales inseguras en producción
+  resources.js                Esquema del contenido: define la BD, la API y los formularios del panel
+  db.js                       Cliente libSQL (archivo local o Turso), migraciones y ajustes
+  storage.js                  Imágenes: compresión a WebP y guardado en Vercel Blob o en disco
+  auth.js                     Sesión firmada (HMAC) y límite de intentos de login
+  markdown.js                 Formato del cuerpo de las publicaciones y reproductores embebidos
+  routes/public.js            Páginas del sitio
+  routes/admin-api.js         API del panel
+  services/instagram.js       Último post de Instagram (API o enlace manual)
+  services/wix-import.js      Importación del Wix anterior
+  services/optimize-images.js Compresión de imágenes ya subidas
+  data/wix-excerpts.json      Entradillas escritas para las columnas importadas
+views/                        Plantillas EJS (partials/ = piezas compartidas)
+public/                       CSS, JS e imágenes del sitio · public/admin/ = panel (sin dependencias)
+scripts/import-wix.js         Versión de terminal de la importación
 ```
 
-Para añadir un campo o una sección nueva, edita `src/resources.js`. La tabla, la API y el formulario se actualizan solos.
+**Agregar un campo o una sección:** se edita `src/resources.js`. La tabla, la API y el formulario del panel se actualizan solos.
 
-## Importar el contenido del Wix anterior
+## Panel de administración (`/admin`)
 
-```bash
-npm run import:wix
-```
-
-Trae del sitio anterior las columnas (con autor, profesión, fecha, texto y foto), las revistas con sus portadas y enlaces, y el podcast. Se puede ejecutar varias veces: no duplica lo que ya existe. Ejecútalo una vez en el servidor después del primer despliegue.
+- **Publicaciones:** columnas, análisis, crónicas… con autor del equipo o columnista invitado (nombre, profesión, posgrados, dónde trabaja y foto). Cada publicación muestra al final el aviso legal configurado en Ajustes.
+- **Equipo:** integrantes por área (el Docente aparece destacado primero).
+- **Revistas** y **Podcast:** los enlaces de Spotify o YouTube se convierten en reproductor.
+- **Ajustes:** identidad, contacto y redes, aviso legal, radio en vivo (día y horario, hora de Colombia) e Instagram.
+- Las fotos se reducen en el navegador y se vuelven a optimizar en el servidor (WebP, máx. 1600 px).
 
 ## Producción (Vercel + Turso + Vercel Blob)
 
-El sitio corre en Vercel como función serverless. Como Vercel no conserva archivos en disco:
+Cada push a `main` se despliega automáticamente en Vercel. Como Vercel no conserva archivos en disco:
 
-- **Base de datos:** [Turso](https://turso.tech) (SQLite en la nube). Variables `TURSO_DATABASE_URL` y `TURSO_AUTH_TOKEN`.
-- **Imágenes subidas:** Vercel Blob. Variable `BLOB_READ_WRITE_TOKEN`.
-- **Panel:** `ADMIN_USER`, `ADMIN_PASSWORD` y `SESSION_SECRET`. En producción el servidor **no arranca** si la contraseña o el secreto tienen menos de 12 caracteres.
+| Variable | Origen |
+|---|---|
+| `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` | Integración Turso (Storage → polso-db) |
+| `BLOB_READ_WRITE_TOKEN` | Blob store público (Storage → polso-sociedad-politica-blob) |
+| `ADMIN_PASSWORD`, `SESSION_SECRET` | Se definen a mano. **Mínimo 12 caracteres**, o el sitio no arranca |
+| `ADMIN_USER` (opcional) | Usuario del panel; por defecto `admin` |
+| `INSTAGRAM_TOKEN` (opcional) | Token de Instagram Graph API para el último post automático |
 
-Pasos:
-1. Importar el repositorio en Vercel (la configuración está en `vercel.json`).
-2. En *Storage*, conectar una base Turso y un Blob store: las variables se agregan solas.
-3. Agregar `ADMIN_PASSWORD` y `SESSION_SECRET` en *Settings → Environment Variables* y volver a desplegar.
-4. Entrar a `/admin` y pulsar **Importar contenido del Wix** (si se corta, se pulsa otra vez y continúa).
-5. Conectar el dominio en *Settings → Domains* y copiar en Hostinger los registros DNS que indique Vercel.
+**Dominio:** `polso.digital` (Hostinger) apunta a Vercel con `A @ → 216.198.79.1` y `CNAME www → *.vercel-dns-017.com`. `polso.digital` redirige a `www.polso.digital`.
 
-En local no hace falta nada de esto: se usan `data/polso.db` y la carpeta `uploads/`.
+**Planes gratuitos:** Turso 5 GB · Blob 1 GB de almacenamiento y 10 GB de transferencia al mes. Con la compresión a WebP alcanza para decenas de miles de visitas al mes.
