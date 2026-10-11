@@ -67,6 +67,10 @@ async function migrate() {
   await db.run("UPDATE members SET position = 0 WHERE area = 'Docente'");
   // Se retiró el equipo de ejemplo (fotos recortadas de la foto grupal); el equipo real se carga desde el panel
   await db.run("DELETE FROM members WHERE photo LIKE '/static/img/equipo/%'");
+  // Una sola vez: vaciar el equipo para cargar el de la nueva temporada desde cero
+  if ((await db.run("INSERT INTO settings (key, value) VALUES ('_members_cleared', datetime('now')) ON CONFLICT(key) DO NOTHING")).changes) {
+    await db.run('DELETE FROM members');
+  }
   await db.run('UPDATE articles SET author_id = NULL WHERE author_id IS NOT NULL AND author_id NOT IN (SELECT id FROM members)');
 
   // Una sola vez: comprimir las imágenes subidas antes de que existiera la compresión automática
