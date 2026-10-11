@@ -5,6 +5,7 @@ import { db, uniqueSlug, getSettings, saveSettings, ready } from '../db.js';
 import { resources, settingsSchema } from '../resources.js';
 import { saveImage, deleteImage } from '../storage.js';
 import { runWixImport } from '../services/wix-import.js';
+import { optimizeExistingImages } from '../services/optimize-images.js';
 import { checkCredentials, createSession, destroySession, requireAdmin, isAdmin, loginRateLimit } from '../auth.js';
 
 const router = express.Router();
@@ -58,6 +59,12 @@ router.post('/import-wix', ah(async (_req, res) => {
   const lines = [];
   const result = await runWixImport((...a) => lines.push(a.join(' ')));
   res.json({ ...result, log: lines });
+}));
+
+// ── Comprimir las imágenes subidas antes de la compresión automática ──
+router.post('/optimize-images', ah(async (_req, res) => {
+  const lines = [];
+  res.json({ ...(await optimizeExistingImages((...a) => lines.push(a.join(' ')))), log: lines });
 }));
 
 // ── Ajustes ─────────────────────────────────────────────

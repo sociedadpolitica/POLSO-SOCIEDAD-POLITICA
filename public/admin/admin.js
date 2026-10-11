@@ -206,7 +206,7 @@ function fieldHtml(f, value) {
       return `<div class="field">${label}<div class="drop ${v ? 'drop--has' : ''}" data-drop>
         <input type="hidden" name="${f.name}" value="${esc(v)}">
         ${v ? `<img src="${esc(v)}" alt=""><div class="drop__actions"><button type="button" data-replace>Cambiar</button><button type="button" data-clear>Quitar</button></div>`
-            : `<div><div class="drop__icon">⇪</div><b>Arrastra una foto o toca para elegir</b><small>JPG, PNG o WEBP · hasta 12 MB</small></div>`}
+            : `<div><div class="drop__icon">⇪</div><b>Arrastra una foto o toca para elegir</b><small>JPG, PNG o WEBP · se optimiza automáticamente</small></div>`}
         <input type="file" accept="image/*" data-file ${v ? 'hidden' : ''}>
         <div class="drop__bar" style="width:0"></div></div>${hint}</div>`;
     case 'select':
@@ -233,6 +233,24 @@ function readForm(form, fields) {
     out[f.name] = f.type === 'checkbox' ? el.checked : el.value;
   }
   return out;
+}
+
+/**
+ * Reduce la foto en el navegador antes de subirla (máx. 1600 px, WebP).
+ * Así se pueden subir fotos de celular de cualquier tamaño y la subida es mucho más rápida.
+ */
+async function shrinkImage(file) {
+  if (file.type === 'image/gif' || !('createImageBitmap' in window)) return file;
+  try {
+    const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
+    const scale = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+    if (scale === 1 && file.size < 600 * 1024) return file;
+    const canvas = Object.assign(document.createElement('canvas'), { width: Math.round(bmp.width * scale), height: Math.round(bmp.height * scale) });
+    canvas.getContext('2d').drawImage(bmp, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise((r) => canvas.toBlob(r, 'image/webp', 0.85));
+    if (!blob || blob.size >= file.size) return file;
+    return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.webp', { type: 'image/webp' });
+  } catch { return file; }
 }
 
 function uploadFile(file, onProgress) {
@@ -267,7 +285,9 @@ function bindImage(drop) {
     if (!file?.type.startsWith('image/')) return toast('Ese archivo no es una imagen', 'error');
     const bar = $('.drop__bar', drop);
     try {
-      const url = await uploadFile(file, (p) => { bar.style.width = `${p * 100}%`; });
+      const small = await shrinkImage(file);
+      if (small.size > 4 * 1024 * 1024) throw new Error('La imagen es demasiado pesada incluso después de reducirla (máx. 4 MB).');
+      const url = await uploadFile(small, (p) => { bar.style.width = `${p * 100}%`; });
       rerender(url);
       toast('Imagen subida');
     } catch (e) { bar.style.width = 0; toast(e.message, 'error'); }
