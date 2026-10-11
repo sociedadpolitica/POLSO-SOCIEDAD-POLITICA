@@ -49,6 +49,19 @@ npm run import:wix
 
 Trae del sitio anterior las columnas (con autor, profesión, fecha, texto y foto), las revistas con sus portadas y enlaces, y el podcast. Se puede ejecutar varias veces: no duplica lo que ya existe. Ejecútalo una vez en el servidor después del primer despliegue.
 
-## Producción
+## Producción (Vercel + Turso + Vercel Blob)
 
-Despliégalo en un VPS, Railway o Render con un **disco persistente** para `data/` y `uploads/`. Configura `NODE_ENV=production` para que la cookie de sesión sea `secure`.
+El sitio corre en Vercel como función serverless. Como Vercel no conserva archivos en disco:
+
+- **Base de datos:** [Turso](https://turso.tech) (SQLite en la nube). Variables `TURSO_DATABASE_URL` y `TURSO_AUTH_TOKEN`.
+- **Imágenes subidas:** Vercel Blob. Variable `BLOB_READ_WRITE_TOKEN`.
+- **Panel:** `ADMIN_USER`, `ADMIN_PASSWORD` y `SESSION_SECRET`. En producción el servidor **no arranca** si la contraseña o el secreto tienen menos de 12 caracteres.
+
+Pasos:
+1. Importar el repositorio en Vercel (la configuración está en `vercel.json`).
+2. En *Storage*, conectar una base Turso y un Blob store: las variables se agregan solas.
+3. Agregar `ADMIN_PASSWORD` y `SESSION_SECRET` en *Settings → Environment Variables* y volver a desplegar.
+4. Entrar a `/admin` y pulsar **Importar contenido del Wix** (si se corta, se pulsa otra vez y continúa).
+5. Conectar el dominio en *Settings → Domains* y copiar en Hostinger los registros DNS que indique Vercel.
+
+En local no hace falta nada de esto: se usan `data/polso.db` y la carpeta `uploads/`.

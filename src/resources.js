@@ -118,6 +118,6 @@ export const settingsSchema = [
   ]},
   { group: 'Instagram en vivo', fields: [
     { name: 'instagram_token', label: 'Token de Instagram Graph API', type: 'text', hint: 'Con token, el último post se muestra solo. Sin token, pega abajo el enlace del último post.' },
-    { name: 'instagram_post_url', label: 'Enlace del último post (respaldo manual)', type: 'url', hint: 'Ej: https://www.instagram.com/p/XXXXXXXX/' },
+    { name: 'instagram_post_url', label: 'Enlace del último post (respaldo manual)', type: 'url', default: 'https://www.instagram.com/p/DeQinS_R-W4/', hint: 'Ej: https://www.instagram.com/p/XXXXXXXX/' },
   ]},
 ];

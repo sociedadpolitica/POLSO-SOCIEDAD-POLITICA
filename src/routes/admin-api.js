@@ -1,23 +1,21 @@
 import express from 'express';
 import multer from 'multer';
-import path from 'node:path';
 import crypto from 'node:crypto';
-import { unlink } from 'node:fs/promises';
-import { db, uniqueSlug, getSettings, saveSettings } from '../db.js';
+import { db, uniqueSlug, getSettings, saveSettings, ready } from '../db.js';
 import { resources, settingsSchema } from '../resources.js';
-import { config } from '../config.js';
+import { saveImage, deleteImage } from '../storage.js';
+import { runWixImport } from '../services/wix-import.js';
 import { checkCredentials, createSession, destroySession, requireAdmin, isAdmin, loginRateLimit } from '../auth.js';
 
 const router = express.Router();
+const ah = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 router.use(express.json({ limit: '2mb' }));
+router.use(ah(async (_req, _res, next) => { await ready; next(); }));
 
 const IMAGE_TYPES = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp', 'image/gif': '.gif', 'image/avif': '.avif' };
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: config.uploadsDir,
-    filename: (_req, file, cb) => cb(null, `${Date.now()}-${crypto.randomBytes(5).toString('hex')}${IMAGE_TYPES[file.mimetype]}`),
-  }),
-  limits: { fileSize: 12 * 1024 * 1024 },
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 4 * 1024 * 1024 }, // límite de cuerpo de las funciones de Vercel (4,5 MB)
   fileFilter: (_req, file, cb) => cb(IMAGE_TYPES[file.mimetype] ? null : new Error('Formato no permitido. Usa JPG, PNG, WEBP, GIF o AVIF.'), Boolean(IMAGE_TYPES[file.mimetype])),
 });
 
@@ -36,24 +34,35 @@ router.use(requireAdmin);
 // ── Esquema (alimenta los formularios del panel) ─────────
 router.get('/schema', (_req, res) => res.json({ resources, settings: settingsSchema }));
 
-router.get('/stats', (_req, res) => {
-  const counts = Object.fromEntries(Object.keys(resources).map(t => [t, db.prepare(`SELECT COUNT(*) n FROM ${t}`).get().n]));
-  const recent = db.prepare(`SELECT id, title, kind, published, updated_at FROM articles ORDER BY updated_at DESC LIMIT 5`).all();
+router.get('/stats', ah(async (_req, res) => {
+  const counts = {};
+  for (const t of Object.keys(resources)) counts[t] = (await db.get(`SELECT COUNT(*) n FROM ${t}`)).n;
+  const recent = await db.all('SELECT id, title, kind, published, updated_at FROM articles ORDER BY updated_at DESC LIMIT 5');
   res.json({ counts, recent });
-});
+}));
 
 // ── Subida de imágenes ──────────────────────────────────
 router.post('/upload', (req, res) => {
   upload.single('file')(req, res, (err) => {
     if (err) return res.status(400).json({ error: err.message });
     if (!req.file) return res.status(400).json({ error: 'No se recibió archivo' });
-    res.json({ url: `/uploads/${req.file.filename}` });
+    const name = `${Date.now()}-${crypto.randomBytes(5).toString('hex')}${IMAGE_TYPES[req.file.mimetype]}`;
+    saveImage(req.file.buffer, name, req.file.mimetype)
+      .then((url) => res.json({ url }))
+      .catch((e) => { console.error(e); res.status(500).json({ error: 'No se pudo guardar la imagen' }); });
   });
 });
 
+// ── Importar el contenido del Wix anterior (se puede repetir sin duplicar) ──
+router.post('/import-wix', ah(async (_req, res) => {
+  const lines = [];
+  const result = await runWixImport((...a) => lines.push(a.join(' ')));
+  res.json({ ...result, log: lines });
+}));
+
 // ── Ajustes ─────────────────────────────────────────────
-router.get('/settings', (_req, res) => res.json(getSettings()));
-router.put('/settings', (req, res) => { saveSettings(req.body || {}); res.json(getSettings()); });
+router.get('/settings', ah(async (_req, res) => res.json(await getSettings())));
+router.put('/settings', ah(async (req, res) => { await saveSettings(req.body || {}); res.json(await getSettings()); }));
 
 // ── CRUD genérico ───────────────────────────────────────
 router.param('resource', (req, res, next, name) => {
@@ -79,51 +88,50 @@ function validate(def, data) {
   return null;
 }
 
-router.get('/:resource', (req, res) => {
-  res.json(db.prepare(`SELECT * FROM ${req.table} ORDER BY ${req.def.order}`).all());
-});
+const byId = (table, id) => db.get(`SELECT * FROM ${table} WHERE id = ?`, id);
 
-router.get('/:resource/:id', (req, res) => {
-  const row = db.prepare(`SELECT * FROM ${req.table} WHERE id = ?`).get(req.params.id);
+router.get('/:resource', ah(async (req, res) => {
+  res.json(await db.all(`SELECT * FROM ${req.table} ORDER BY ${req.def.order}`));
+}));
+
+router.get('/:resource/:id', ah(async (req, res) => {
+  const row = await byId(req.table, req.params.id);
   row ? res.json(row) : res.status(404).json({ error: 'No encontrado' });
-});
+}));
 
-router.post('/:resource', (req, res) => {
+router.post('/:resource', ah(async (req, res) => {
   const data = clean(req.def, req.body || {});
-  for (const f of req.def.fields) if (!(f.name in data) && f.default !== undefined) data[f.name] = f.default;
+  for (const f of req.def.fields) if (f.name && !(f.name in data) && f.default !== undefined) data[f.name] = f.default;
   const error = validate(req.def, data);
   if (error) return res.status(400).json({ error });
-  if ('published_at' in Object.fromEntries(req.def.fields.map(f => [f.name])) && !data.published_at) data.published_at = new Date().toISOString().slice(0, 10);
-  data.slug = uniqueSlug(req.table, data.title || data.name);
+  if (req.def.fields.some((f) => f.name === 'published_at') && !data.published_at) data.published_at = new Date().toISOString().slice(0, 10);
+  data.slug = await uniqueSlug(req.table, data.title || data.name);
   const cols = Object.keys(data);
-  const { lastInsertRowid } = db.prepare(`INSERT INTO ${req.table} (${cols.join(',')}) VALUES (${cols.map(() => '?').join(',')})`).run(...Object.values(data));
-  res.status(201).json(db.prepare(`SELECT * FROM ${req.table} WHERE id = ?`).get(lastInsertRowid));
-});
+  const { lastInsertRowid } = await db.run(`INSERT INTO ${req.table} (${cols.join(',')}) VALUES (${cols.map(() => '?').join(',')})`, ...Object.values(data));
+  res.status(201).json(await byId(req.table, lastInsertRowid));
+}));
 
-router.put('/:resource/:id', (req, res) => {
-  const current = db.prepare(`SELECT * FROM ${req.table} WHERE id = ?`).get(req.params.id);
+router.put('/:resource/:id', ah(async (req, res) => {
+  const current = await byId(req.table, req.params.id);
   if (!current) return res.status(404).json({ error: 'No encontrado' });
   const data = clean(req.def, req.body || {});
   const error = validate(req.def, { ...current, ...data });
   if (error) return res.status(400).json({ error });
   const title = data.title || data.name;
-  if (title && title !== (current.title || current.name)) data.slug = uniqueSlug(req.table, title, current.id);
+  if (title && title !== (current.title || current.name)) data.slug = await uniqueSlug(req.table, title, current.id);
   const cols = Object.keys(data);
-  if (cols.length) db.prepare(`UPDATE ${req.table} SET ${cols.map(c => `${c} = ?`).join(', ')}, updated_at = datetime('now') WHERE id = ?`).run(...Object.values(data), current.id);
-  res.json(db.prepare(`SELECT * FROM ${req.table} WHERE id = ?`).get(current.id));
-});
+  if (cols.length) await db.run(`UPDATE ${req.table} SET ${cols.map((c) => `${c} = ?`).join(', ')}, updated_at = datetime('now') WHERE id = ?`, ...Object.values(data), current.id);
+  res.json(await byId(req.table, current.id));
+}));
 
-router.delete('/:resource/:id', async (req, res) => {
-  const row = db.prepare(`SELECT * FROM ${req.table} WHERE id = ?`).get(req.params.id);
+router.delete('/:resource/:id', ah(async (req, res) => {
+  const row = await byId(req.table, req.params.id);
   if (!row) return res.status(404).json({ error: 'No encontrado' });
-  if (req.table === 'members') db.prepare('UPDATE articles SET author_id = NULL WHERE author_id = ?').run(row.id);
-  db.prepare(`DELETE FROM ${req.table} WHERE id = ?`).run(row.id);
-  // Limpia imágenes huérfanas del registro borrado
-  for (const f of req.def.fields.filter(f => f.type === 'image')) {
-    const v = row[f.name];
-    if (v?.startsWith('/uploads/')) await unlink(path.join(config.uploadsDir, path.basename(v))).catch(() => {});
-  }
+  if (req.table === 'members') await db.run('UPDATE articles SET author_id = NULL WHERE author_id = ?', row.id);
+  await db.run(`DELETE FROM ${req.table} WHERE id = ?`, row.id);
+  // Limpia las imágenes subidas del registro borrado
+  for (const f of req.def.fields.filter((f) => f.type === 'image')) await deleteImage(row[f.name]);
   res.json({ ok: true });
-});
+}));
 
 export default router;

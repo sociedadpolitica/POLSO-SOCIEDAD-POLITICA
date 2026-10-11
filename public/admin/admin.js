@@ -114,6 +114,7 @@ async function viewHome() {
       <a class="btn btn--ghost" href="#/magazines/new">＋ Revista</a>
       <a class="btn btn--ghost" href="#/episodes/new">＋ Episodio</a>
       <a class="btn btn--ghost" href="#/settings">Actualizar Instagram</a>
+      <button class="btn btn--ghost" data-import>⇩ Importar contenido del Wix</button>
     </div>
     <div class="panel"><h3>Editado recientemente</h3>
       ${recent.length ? recent.map((a) => `<a href="#/articles/${a.id}" class="row" style="box-shadow:none;padding-inline:0;grid-template-columns:1fr auto;text-decoration:none">
@@ -121,6 +122,22 @@ async function viewHome() {
         <span class="pill ${a.published ? 'pill--ok' : 'pill--draft'}">${a.published ? 'Publicado' : 'Borrador'}</span></a>`).join('') : '<p style="color:var(--muted)">Aún no hay publicaciones.</p>'}
     </div>`);
 }
+
+// Importación del Wix: tarda alrededor de un minuto; si se corta, basta con repetirla
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-import]');
+  if (!btn) return;
+  if (!(await confirmDialog('¿Importar el contenido del Wix?', 'Trae las columnas, revistas y podcast del sitio anterior. Lo que ya exista no se duplica. Tarda alrededor de un minuto.', 'Importar'))) return;
+  btn.disabled = true; btn.textContent = 'Importando… no cierres esta página';
+  try {
+    const r = await api('/import-wix', { method: 'POST' });
+    toast(`Importado: ${r.columns} columnas, ${r.magazines} revistas, ${r.episodes} episodios nuevos`);
+    viewHome();
+  } catch (ex) {
+    toast('Se cortó antes de terminar. Vuelve a pulsar «Importar»: continúa donde quedó.', 'error');
+    btn.disabled = false; btn.textContent = '⇩ Importar contenido del Wix';
+  }
+});
 
 // ── Listado ────────────────────────────────────────────
 async function viewList(resource, openId) {

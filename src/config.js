@@ -13,12 +13,25 @@ if (existsSync(envFile)) {
   }
 }
 
+const isProd = process.env.NODE_ENV === 'production' || Boolean(process.env.VERCEL);
+
+// En producción nunca se arranca con las credenciales de ejemplo
+if (isProd) {
+  const missing = ['ADMIN_PASSWORD', 'SESSION_SECRET'].filter((k) => !process.env[k] || process.env[k].length < 12);
+  if (missing.length) throw new Error(`Faltan variables de entorno seguras (mínimo 12 caracteres): ${missing.join(', ')}`);
+}
+
 export const config = {
+  isProd,
   port: Number(process.env.PORT) || 3000,
   adminUser: process.env.ADMIN_USER || 'admin',
   adminPassword: process.env.ADMIN_PASSWORD || 'polso2026',
   sessionSecret: process.env.SESSION_SECRET || 'polso-dev-secret-change-me',
   instagramToken: process.env.INSTAGRAM_TOKEN || '',
-  dbFile: path.join(ROOT, 'data', 'polso.db'),
+  // Base de datos: Turso (libSQL) en producción; archivo SQLite local en desarrollo
+  dbUrl: process.env.TURSO_DATABASE_URL || `file:${path.join(ROOT, 'data', 'polso.db')}`,
+  dbToken: process.env.TURSO_AUTH_TOKEN || undefined,
+  // Imágenes: Vercel Blob si hay token; si no, carpeta local
+  blobToken: process.env.BLOB_READ_WRITE_TOKEN || '',
   uploadsDir: path.join(ROOT, 'uploads'),
 };

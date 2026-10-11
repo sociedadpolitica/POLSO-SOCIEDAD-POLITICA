@@ -1,7 +1,6 @@
 import express from 'express';
 import path from 'node:path';
 import { config, ROOT } from './src/config.js';
-import './src/db.js';
 import publicRoutes from './src/routes/public.js';
 import adminApi from './src/routes/admin-api.js';
 
@@ -24,8 +23,17 @@ app.use('/api/admin', adminApi);
 app.use('/', publicRoutes);
 
 app.use((req, res) => res.status(404).render('404', { title: 'No encontrado', site: res.locals.site || {}, path: req.path }));
-app.use((err, _req, res, _next) => { console.error(err); res.status(500).send('Error interno'); });
-
-app.listen(config.port, () => {
-  console.log(`\n  POLSO · XIV Edición\n  Sitio:  http://localhost:${config.port}\n  Admin:  http://localhost:${config.port}/admin\n`);
+app.use((err, req, res, _next) => {
+  console.error(err);
+  if (req.path.startsWith('/api/')) return res.status(500).json({ error: 'Error interno' });
+  res.status(500).send('Error interno');
 });
+
+export default app;
+
+// En Vercel la app se ejecuta como función; en local, como servidor normal
+if (!process.env.VERCEL) {
+  app.listen(config.port, () => {
+    console.log(`\n  POLSO · Temporada XIV\n  Sitio:  http://localhost:${config.port}\n  Admin:  http://localhost:${config.port}/admin\n`);
+  });
+}
