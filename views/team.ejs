@@ -1,7 +1,7 @@
 <%- include('partials/head') %>
 <section class="page-hero page-hero--photo">
   <div class="wrap page-hero__text">
-    <p class="eyebrow eyebrow--yellow">Temporada <%= site.edition %> · <%= total %> integrantes</p>
+    <p class="eyebrow eyebrow--yellow">Temporada <%= site.edition %><%= total ? ` · ${total} integrantes` : '' %></p>
     <h1 class="page-title">Esto es Polso.</h1>
     <p class="page-dek">Un equipo. Diferentes talentos. Un mismo propósito.</p>
   </div>
@@ -9,7 +9,10 @@
     <img src="<%= site.hero_image || '/static/img/equipo-xiv-foto.jpg' %>" alt="Equipo POLSO Temporada <%= site.edition %>">
   </div>
 </section>
-<nav class="wrap chips chips--sticky" aria-label="Áreas">
+<% if (!groups.length) { %>
+<section class="wrap section"><div class="empty">Muy pronto conocerás al equipo de la Temporada <%= site.edition %>.</div></section>
+<% } %>
+<nav class="wrap chips chips--sticky" aria-label="Áreas"<%= groups.length ? '' : ' hidden' %>>
   <% groups.forEach(g => { %><a href="#<%= slug(g.area) %>" class="chip"><%= g.area %> <small><%= g.members.length %></small></a><% }) %>
 </nav>
 <% groups.forEach(g => { if (g.area === 'Docente') { %>

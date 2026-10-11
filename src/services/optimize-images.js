@@ -20,8 +20,8 @@ async function load(url) {
   return Buffer.from(await r.arrayBuffer());
 }
 
-export async function optimizeExistingImages(log = console.log) {
-  await ready;
+export async function optimizeExistingImages(log = console.log, { waitForDb = true } = {}) {
+  if (waitForDb) await ready; // desde la migración inicial la base ya está lista
   const done = new Map(); // la misma imagen puede estar en varias filas
   let saved = 0, before = 0, after = 0;
   const convert = async (url) => {

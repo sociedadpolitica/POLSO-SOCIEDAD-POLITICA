@@ -43,18 +43,6 @@ export async function saveSettings(values) {
   if (stmts.length) await client.batch(stmts, 'write');
 }
 
-// Equipo de la Temporada XIV (fotos recortadas de la foto grupal, áreas según el reel oficial).
-// Los nombres se completan desde el panel.
-const TEAM_XIV = [
-  [22, 'Docente', 'Docente'],
-  [1, 'Dirección', 'Director general'],
-  [3, 'Radio'], [5, 'Radio'], [15, 'Radio'], [16, 'Radio'], [17, 'Radio'], [20, 'Radio'],
-  [2, 'Televisión'], [4, 'Televisión'], [6, 'Televisión'], [8, 'Televisión'], [9, 'Televisión'], [12, 'Televisión'], [19, 'Televisión'],
-  [11, 'Redes sociales'], [13, 'Redes sociales'], [21, 'Redes sociales'],
-  [7, 'Diseño gráfico'], [10, 'Diseño gráfico'],
-  [14, 'Sitio web'], [18, 'Sitio web'],
-];
-
 const SQL_TYPES = { number: 'INTEGER', checkbox: 'INTEGER', relation: 'INTEGER' };
 
 /** Crea/migra las tablas a partir del esquema y siembra el contenido inicial. */
@@ -74,17 +62,24 @@ async function migrate() {
   }
   await client.execute('CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT)');
 
-  if (!(await db.get("SELECT COUNT(*) AS n FROM members WHERE photo LIKE '/static/img/equipo/%'")).n) {
-    for (const [i, [n, area, role]] of TEAM_XIV.entries()) {
-      const num = String(n).padStart(2, '0');
-      await db.run('INSERT INTO members (slug, name, area, role, photo, position) VALUES (?, ?, ?, ?, ?, ?)',
-        await uniqueSlug('members', area === 'Docente' ? 'docente' : `integrante-${num}`), area === 'Docente' ? 'Docente' : `Integrante ${num}`,
-        area, role || `Equipo de ${area.toLowerCase()}`, `/static/img/equipo/integrante-${num}.jpg`, area === 'Docente' ? 0 : i + 1);
-    }
-  }
   // Migraciones de datos anteriores
   await db.run("UPDATE members SET area = 'Docente', role = 'Docente' WHERE area = 'Docencia y asesoría'");
   await db.run("UPDATE members SET position = 0 WHERE area = 'Docente'");
+  // Se retiró el equipo de ejemplo (fotos recortadas de la foto grupal); el equipo real se carga desde el panel
+  await db.run("DELETE FROM members WHERE photo LIKE '/static/img/equipo/%'");
+  await db.run('UPDATE articles SET author_id = NULL WHERE author_id IS NOT NULL AND author_id NOT IN (SELECT id FROM members)');
+
+  // Una sola vez: comprimir las imágenes subidas antes de que existiera la compresión automática
+  const claim = await db.run("INSERT INTO settings (key, value) VALUES ('_images_optimized', datetime('now')) ON CONFLICT(key) DO NOTHING");
+  if (claim.changes) {
+    try {
+      const { optimizeExistingImages } = await import('./services/optimize-images.js');
+      const r = await optimizeExistingImages(() => {}, { waitForDb: false });
+      console.log(`[imágenes] ${r.images} optimizadas: ${r.beforeKB} KB → ${r.afterKB} KB`);
+    } catch (e) {
+      console.error('[imágenes] no se pudo optimizar', e); // el sitio sigue funcionando igual
+    }
+  }
 }
 
 // Promesa única: las rutas esperan a que la base esté lista (importante en serverless)

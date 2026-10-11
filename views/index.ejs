@@ -57,8 +57,8 @@
       <h2 class="about__title">Un equipo. Diferentes talentos. <em>Un mismo propósito.</em></h2>
       <p class="about__text"><%= site.about %></p>
       <dl class="stats">
-        <div><dt><%= team.length %></dt><dd>integrantes</dd></div>
-        <div><dt><%= areas.length %></dt><dd>áreas</dd></div>
+        <% if (team.length) { %><div><dt><%= team.length %></dt><dd>integrantes</dd></div><% } %>
+        <% if (areas.length) { %><div><dt><%= areas.length %></dt><dd>áreas</dd></div><% } %>
         <div><dt><%= site.edition %></dt><dd>temporadas</dd></div>
       </dl>
     </div>
