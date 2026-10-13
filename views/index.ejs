@@ -22,14 +22,14 @@
   <header class="section__head reveal"><p class="eyebrow">Lo último</p><h2 class="section__title">Lo que estamos pensando.</h2></header>
   <div class="feature">
     <a class="feature__lead reveal" href="/publicaciones/<%= lead.slug %>">
-      <figure class="<%= lead.cover ? '' : 'is-author' %>"><% if (lead.cover || lead.author_photo) { %><img src="<%= lead.cover || lead.author_photo %>" alt=""><% } else { %><div class="feature__ph"><img src="/static/img/logo-polso.png" alt=""></div><% } %></figure>
+      <figure class="<%= lead.cover ? '' : 'is-author' %>"><% if (lead.cover || lead.by_photo) { %><img src="<%= lead.cover || lead.by_photo %>" alt=""><% } else { %><div class="feature__ph"><img src="/static/img/logo-polso.png" alt=""></div><% } %></figure>
       <div class="feature__text">
         <span class="tag tag--solid"><%= lead.kind %></span>
         <h3><%= lead.title %></h3>
         <% if (lead.excerpt) { %><p><%= lead.excerpt %></p><% } %>
         <div class="author">
-          <% if (lead.author_photo) { %><img src="<%= lead.author_photo %>" alt=""><% } else { %><span class="author__ph"><%= (lead.author_name || 'P')[0] %></span><% } %>
-          <span><strong><%= lead.author_name || 'Redacción POLSO' %></strong><small><%= fmtDate(lead.published_at) %> · <%= readingTime(lead.body) %> min</small></span>
+          <% if (lead.by_photo) { %><img src="<%= lead.by_photo %>" alt=""><% } else { %><span class="author__ph"><%= (lead.by_name || 'P')[0] %></span><% } %>
+          <span><strong><%= lead.by_name || 'Redacción POLSO' %></strong><small><%= fmtDate(lead.published_at) %> · <%= readingTime(lead.body) %> min</small></span>
         </div>
       </div>
     </a>
@@ -37,7 +37,7 @@
       <% secondary.concat(more).slice(0, 4).forEach((a, i) => { %>
         <a class="mini reveal" href="/publicaciones/<%= a.slug %>" style="--d:<%= i * 70 %>ms">
           <span class="mini__n"><%= String(i + 1).padStart(2, '0') %></span>
-          <span><span class="eyebrow"><%= a.kind %></span><strong><%= a.title %></strong><small><%= a.author_name || 'Redacción' %></small></span>
+          <span><span class="eyebrow"><%= a.kind %></span><strong><%= a.title %></strong><small><%= a.by_name || 'Redacción' %></small></span>
         </a>
       <% }) %>
       <% if (!secondary.length) { %>

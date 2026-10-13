@@ -1,6 +1,6 @@
 <article class="card reveal">
   <a href="/publicaciones/<%= a.slug %>" class="card__link">
-    <% const img = a.cover || a.author_photo; %>
+    <% const img = a.cover || a.by_photo; %>
     <figure class="card__img<%= img ? (a.cover ? '' : ' card__img--author') : ' card__img--empty' %>">
       <% if (img) { %><img src="<%= img %>" alt="" loading="lazy"><% } else { %><img src="/static/img/logo-polso-sm.png" alt="" class="card__logo"><% } %>
       <span class="tag"><%= a.kind %></span>
@@ -9,7 +9,7 @@
       <p class="eyebrow"><%= a.section %></p>
       <h3 class="card__title"><%= a.title %></h3>
       <% if (a.excerpt) { %><p class="card__excerpt"><%= a.excerpt %></p><% } %>
-      <p class="meta"><%= a.author_name || 'Redacción POLSO' %> · <%= readingTime(a.body) %> min</p>
+      <p class="meta"><%= a.by_name || 'Redacción POLSO' %> · <%= readingTime(a.body) %> min</p>
     </div>
   </a>
 </article>

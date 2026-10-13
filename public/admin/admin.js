@@ -340,6 +340,51 @@ function bindRich(rte) {
   updateCount();
 }
 
+/**
+ * Autor de una publicación: al elegir un integrante se muestra su tarjeta (foto, nombre, área)
+ * y se ocultan los campos de invitado, porque el sitio usará los datos de su perfil del equipo.
+ */
+const GUEST_FIELDS = ['author_full_name', 'author_profession', 'author_studies', 'author_workplace', 'author_photo'];
+
+function bindAuthor(form) {
+  const select = form.elements.author_id;
+  if (!select) return;
+  const wrap = (name) => form.elements[name]?.closest('.field');
+  const preview = Object.assign(document.createElement('div'), { className: 'author-card' });
+  select.closest('.field').after(preview);
+
+  const clearGuest = () => GUEST_FIELDS.forEach((n) => {
+    const el = form.elements[n];
+    if (!el) return;
+    el.value = '';
+    if (n === 'author_photo') { const drop = el.closest('[data-drop]'); $('[data-clear]', drop)?.click(); }
+  });
+
+  const render = () => {
+    const m = (state.cache.members || []).find((x) => String(x.id) === select.value);
+    GUEST_FIELDS.forEach((n) => { const w = wrap(n); if (w) w.hidden = Boolean(m); });
+    if (!m) { preview.hidden = true; return; }
+    const initials = m.name.split(' ').map((w) => w[0]).slice(0, 2).join('');
+    preview.hidden = false;
+    preview.innerHTML = `
+      ${m.photo ? `<img src="${esc(m.photo)}" alt="">` : `<span>${esc(initials)}</span>`}
+      <div><strong>${esc(m.name)}</strong><small>${esc(m.role || m.area || '')}</small>
+      <p>${m.photo ? 'Se usarán su <b>foto</b> y sus datos del perfil del equipo.'
+        : '⚠️ Este integrante aún no tiene foto. Súbela en <a href="#/members/' + m.id + '" target="_blank">Equipo → ' + esc(m.name) + '</a> y aparecerá sola en sus publicaciones.'}</p></div>`;
+  };
+
+  select.addEventListener('change', async () => {
+    const guestName = form.elements.author_full_name?.value.trim();
+    if (select.value && guestName) {
+      const ok = await confirmDialog('¿Usar el perfil del integrante?', `Se quitarán los datos del invitado «${guestName}» y se usarán la foto y los datos del perfil del equipo.`, 'Usar perfil');
+      if (!ok) { select.value = ''; render(); return; }
+    }
+    if (select.value) clearGuest();
+    render();
+  });
+  render();
+}
+
 // ── Editor ─────────────────────────────────────────────
 async function openEditor(resource, id) {
   const def = state.schema.resources[resource];
@@ -363,6 +408,7 @@ async function openEditor(resource, id) {
   document.body.style.overflow = 'hidden';
   $$('[data-drop]', drawer).forEach(bindImage);
   $$('[data-rte]', drawer).forEach(bindRich);
+  if (resource === 'articles') bindAuthor(drawer);
   drawer.addEventListener('input', () => { state.dirty = true; });
   setTimeout(() => $('input:not([type=hidden]):not([type=file]), textarea', drawer)?.focus(), 50);
 

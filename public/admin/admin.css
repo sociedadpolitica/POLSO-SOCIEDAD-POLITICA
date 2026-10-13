@@ -6,6 +6,7 @@
   --ease: cubic-bezier(.2,.7,.1,1);
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--sans); -webkit-font-smoothing: antialiased; }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
@@ -165,3 +166,11 @@ textarea.input { min-height: 96px; resize: vertical; }
 
 .form-heading h3 { font: 700 18px var(--serif); margin: 0; }
 .form-heading small { display: block; color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+/* Tarjeta del autor del equipo en el editor de publicaciones */
+.author-card { display: flex; gap: 14px; align-items: center; padding: 14px; border-radius: 12px; background: #EEF3FF; border: 1px solid #D6E1FF; }
+.author-card img, .author-card > span { flex: none; width: 64px; height: 64px; border-radius: 50%; object-fit: cover; object-position: center 25%; background: var(--ink); color: var(--yellow); display: grid; place-items: center; font-weight: 800; font-size: 20px; }
+.author-card strong { display: block; font-size: 16px; }
+.author-card small { color: var(--muted); }
+.author-card p { margin: 6px 0 0; font-size: 13.5px; color: var(--ink-2); }
+.author-card a { color: var(--blue); font-weight: 600; }

@@ -21,7 +21,7 @@ export const resources = {
       { name: 'excerpt', label: 'Entradilla (resumen corto)', type: 'textarea', hint: 'Una o dos frases que enganchen al lector.' },
       { name: 'body', label: 'Cuerpo del texto', type: 'richtext', hint: 'Separa párrafos con una línea en blanco. **negrita**, *cursiva*, ## Subtítulo, > Cita destacada' },
       { name: 'cover', label: 'Imagen de portada', type: 'image' },
-      { type: 'heading', label: 'Autor', hint: 'Elige a alguien del equipo, o escribe los datos de un columnista invitado. Lo que escribas aquí tiene prioridad.' },
+      { type: 'heading', label: 'Autor', hint: 'Si es de POLSO, elígelo en la lista: se usarán su foto y sus datos del perfil del equipo. Si es un invitado, deja «Redacción POLSO» y escribe sus datos.' },
       { name: 'author_id', label: 'Integrante del equipo', type: 'relation', resource: 'members' },
       { name: 'author_full_name', label: 'Nombre completo', type: 'text', hint: 'Ej: María Fernanda Pérez Quintero' },
       { name: 'author_profession', label: 'Profesión', type: 'text', hint: 'Ej: Abogada, Comunicador social, Economista' },

@@ -35,12 +35,17 @@ const router = express.Router();
 // Express 4 no captura errores de funciones async: este envoltorio los pasa al manejador de errores
 const ah = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
-const pick = (f, mf = f) => `COALESCE(NULLIF(a.author_${f}, ''), m.${mf})`;
+// Autor: si la publicación tiene nombre de invitado se usan solo sus datos;
+// si no, se usan todos los del integrante del equipo (incluida su foto de perfil).
+// Se exponen como by_* para no chocar con las columnas author_* de la tabla.
+const GUEST = "NULLIF(a.author_full_name, '') IS NOT NULL";
+const pick = (f, mf = f) => `CASE WHEN ${GUEST} THEN NULLIF(a.author_${f}, '') ELSE m.${mf} END`;
 const ARTICLE_SQL = `SELECT a.*,
-    ${pick('full_name', 'name')} AS author_name, ${pick('photo')} AS author_photo,
-    ${pick('profession')} AS author_profession, ${pick('studies')} AS author_studies, ${pick('workplace')} AS author_workplace,
-    COALESCE(NULLIF(a.author_profession, ''), m.role) AS author_role,
-    CASE WHEN NULLIF(a.author_full_name, '') IS NULL THEN m.slug END AS author_slug, m.bio AS author_bio
+    ${pick('full_name', 'name')} AS by_name, ${pick('photo')} AS by_photo,
+    ${pick('profession')} AS by_profession, ${pick('studies')} AS by_studies, ${pick('workplace')} AS by_workplace,
+    CASE WHEN ${GUEST} THEN NULLIF(a.author_profession, '') ELSE COALESCE(NULLIF(m.role, ''), m.area) END AS by_role,
+    CASE WHEN ${GUEST} THEN NULL ELSE m.slug END AS by_slug,
+    CASE WHEN ${GUEST} THEN NULL ELSE m.bio END AS by_bio
   FROM articles a LEFT JOIN members m ON m.id = a.author_id WHERE a.published = 1`;
 
 // Datos comunes para todas las vistas
