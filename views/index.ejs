@@ -72,7 +72,7 @@
     <% areas.forEach((g, i) => { %>
       <a class="area reveal" href="/equipo#<%= slug(g.area) %>" style="--d:<%= i * 60 %>ms">
         <div class="area__faces">
-          <% g.members.slice(0, 4).forEach(m => { %><img src="<%= m.photo %>" alt="" loading="lazy"><% }) %>
+          <% g.members.slice(0, 4).forEach(m => { %><% if (m.photo) { %><img src="<%= m.photo %>" alt="" loading="lazy"><% } else { %><span><%= m.name.split(' ').map(w => w[0]).slice(0, 2).join('') %></span><% } %><% }) %>
           <% if (g.members.length > 4) { %><span>+<%= g.members.length - 4 %></span><% } %>
         </div>
         <span class="area__icon"><%= g.icon %></span>
@@ -118,7 +118,11 @@
         <p class="ep-label">Episodio <%= episode.number || '' %></p>
         <h3 class="ep-title"><%= episode.title %></h3>
         <% if (src) { %><iframe class="player" src="<%= src %>" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" title="<%= episode.title %>"></iframe>
-        <% } else if (episode.link) { %><a class="btn btn--yellow" href="<%= episode.link %>" target="_blank" rel="noopener">Escuchar ▶</a><% } %>
+        <% } else if (episode.link) { %>
+          <% if (episode.description) { %><p class="ep-desc"><%= episode.description %></p><% } %>
+          <a class="btn btn--yellow" href="<%= episode.link %>" target="_blank" rel="noopener">Escuchar ▶</a>
+          <div class="wave wave--end" aria-hidden="true"><% for (let i = 0; i < 32; i++) { %><i style="--i:<%= i %>"></i><% } %></div>
+        <% } %>
       <% } else { %>
         <div class="wave" aria-hidden="true"><% for (let i = 0; i < 32; i++) { %><i style="--i:<%= i %>"></i><% } %></div>
         <p class="soon__text">Micrófonos encendidos. Muy pronto, nuevos episodios.</p>

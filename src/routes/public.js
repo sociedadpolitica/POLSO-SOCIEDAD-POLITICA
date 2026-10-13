@@ -60,9 +60,9 @@ router.get('/', ah(async (_req, res) => {
   const [lead, ...rest] = articles;
   res.render('index', {
     title: null, hasHero: true, lead, secondary: rest.slice(0, 3), more: rest.slice(3),
-    magazines: await db.all('SELECT * FROM magazines ORDER BY published_at DESC LIMIT 4'),
+    magazines: await db.all('SELECT * FROM magazines ORDER BY published_at DESC LIMIT 3'),
     episode: await db.get('SELECT * FROM episodes ORDER BY published_at DESC LIMIT 1'),
-    team: await db.all('SELECT * FROM members WHERE photo IS NOT NULL AND photo != \'\' ORDER BY position, id'),
+    team: await db.all('SELECT id FROM members'),
     areas: (await teamByArea()).filter((g) => g.area !== 'Docente'),
     instagram: await getLatestPost(res.locals.site),
     embedUrl,

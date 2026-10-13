@@ -227,7 +227,7 @@ body:not(.has-hero) main { padding-top: 64px; }
 .area p { color: var(--ink-2); font-size: 16px; flex: 1; }
 .area small { color: var(--blue); font-weight: 600; font-size: 14px; }
 .area__faces { position: absolute; top: 28px; right: 24px; display: flex; }
-.area__faces img, .area__faces span { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; object-position: center 25%; border: 3px solid var(--bg-2); margin-left: -12px; background: var(--navy); color: #fff; font-size: 12px; font-weight: 700; display: grid; place-items: center; transition: border-color .4s; }
+.area__faces img, .area__faces span { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; object-position: center 25%; border: 3px solid var(--bg-2); margin-left: -12px; background: var(--navy); color: var(--yellow); font-size: 12px; font-weight: 700; display: grid; place-items: center; transition: border-color .4s; }
 .area:hover .area__faces img, .area:hover .area__faces span { border-color: var(--navy); }
 
 /* ── Cita ────────────────────────────────────── */
@@ -258,6 +258,8 @@ body:not(.has-hero) main { padding-top: 64px; }
 .soon p, .soon__text { font-size: 19px; color: var(--ink-2); }
 .panel--navy .soon__text { color: rgba(255,255,255,.75); }
 .ep-label { color: var(--yellow); font-weight: 600; font-size: 14px; }
+.ep-desc { color: rgba(255,255,255,.75); margin: -6px 0 20px; font-size: 16px; }
+.wave--end { margin: auto 0 0; padding-top: 28px; height: 110px; }
 .ep-title { font-size: 24px; margin: 6px 0 18px; }
 .player { width: 100%; height: 232px; border: 0; border-radius: 14px; }
 .wave { display: flex; align-items: center; gap: 4px; height: 96px; margin-bottom: 20px; }
@@ -295,7 +297,8 @@ body:not(.has-hero) main { padding-top: 64px; }
 .face__img { aspect-ratio: 4/5; border-radius: var(--r-md); overflow: hidden; background: var(--bg-2); margin-bottom: 12px; display: grid; place-items: center; }
 .face__img img { width: 100%; height: 100%; object-fit: cover; transition: transform .8s var(--ease); }
 .face:hover .face__img img { transform: scale(1.06); }
-.face__img span { font-size: 48px; font-weight: 800; color: var(--muted); }
+.face__img:not(:has(img)) { background: radial-gradient(120% 120% at 80% 0%, var(--navy-3), var(--navy) 65%); }
+.face__img span { font-size: 44px; font-weight: 800; letter-spacing: -.04em; color: var(--yellow); }
 .face strong { font-size: 17px; letter-spacing: -.02em; }
 .face small { color: var(--muted); font-size: 14px; }
 .area-block { padding-block: clamp(40px, 6vw, 72px); border-top: 1px solid var(--line); }
@@ -455,7 +458,25 @@ body:not(.has-hero) main { padding-top: 64px; }
   .hero__title br { display: inline; }
   .hero__cta .btn { flex: 1 1 auto; justify-content: center; }
   .grid { grid-template-columns: 1fr; }
-  .areas { grid-template-columns: 1fr; }
+  .areas { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; margin-inline: calc(var(--gutter) * -1); padding: 4px var(--gutter) 16px; scroll-padding-inline: var(--gutter); scrollbar-width: none; }
+  .areas::-webkit-scrollbar { display: none; }
+  .area { flex: 0 0 78%; scroll-snap-align: start; padding: 22px; }
+  .area h3 { font-size: 22px; }
+  .about__logo img { max-width: 150px; }
+  .about { padding-block: 64px; }
+  .panel .shelf { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .panel .mag strong { font-size: 13px; }
+  .panel .mag small { font-size: 12px; }
+  /* Publicaciones en lista compacta: foto a un lado */
+  .grid { gap: 12px; }
+  .grid .card__link { flex-direction: row; align-items: stretch; border-radius: var(--r-md); }
+  .grid .card__img { flex: none; width: 108px; aspect-ratio: auto; min-height: 120px; }
+  .grid .card__img .tag { display: none; }
+  .grid .card__body { padding: 14px 16px; }
+  .grid .card__title { font-size: 17px; }
+  .grid .card__excerpt { display: none; }
+  .grid .meta { margin-top: 8px; font-size: 13px; }
+  .grid .eyebrow { margin-bottom: 4px; font-size: 12px; }
   .area { min-height: 0; }
   .stats div { padding: 14px; }
   .faces { grid-template-columns: 1fr 1fr; gap: 20px 12px; }
