@@ -68,6 +68,26 @@ async function migrate() {
     await db.run('DELETE FROM members');
     await db.run('UPDATE articles SET author_id = NULL');
   });
+  await once('_team_xiv_students', async () => {
+    // Estudiantes de la Temporada XIV con su comité. Las fotos se suben desde el panel.
+    const STUDENTS = [
+      ['Evelin Daniela Sanguino Acosta', 'Redes sociales'],
+      ['Steeven Andrey Zuleta Ropero', 'Diseño gráfico'],
+      ['Karent Lorena Joya Vargas', 'Radio'],
+      ['Maidu Díaz Sánchez', 'Redes sociales'],
+      ['Nicolás Guerra Martínez', 'Sitio web'],
+      ['Zharick Solano Rincón', 'Televisión'],
+      ['Natalia Reyes Rangel', 'Radio'],
+      ['Valentina Pallares García', 'Televisión'],
+      ['Ximena Villamizar Sánchez', 'Redes sociales'],
+      ['Yarith Cristina Ortega Macgregor', 'Radio'],
+    ];
+    for (const [i, [name, area]] of STUDENTS.entries()) {
+      if (await db.get('SELECT 1 FROM members WHERE name = ?', name)) continue;
+      await db.run('INSERT INTO members (slug, name, area, role, position) VALUES (?, ?, ?, ?, ?)',
+        await uniqueSlug('members', name), name, area, `Equipo de ${area.toLowerCase()}`, i + 1);
+    }
+  });
   await once('_images_optimized', async () => {
     // Comprime a WebP las imágenes subidas antes de que existiera la compresión automática
     const { optimizeExistingImages } = await import('./services/optimize-images.js');
