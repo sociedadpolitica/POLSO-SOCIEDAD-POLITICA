@@ -113,13 +113,6 @@ body:not(.has-hero) main { padding-top: 64px; }
   .hero { min-height: 100svh; display: flex; flex-direction: column; justify-content: flex-end; text-align: left; }
   .hero::before { display: none; }
   .hero__media { position: absolute; inset: 0; max-width: none; padding: 0; }
-  /* La foto mide ~1535 px: en pantallas más anchas no se estira; queda a su tamaño
-     real, centrada, y sus lados se funden con el azul del fondo. */
-  @media (min-width: 1600px) {
-    .hero__media { left: 50%; right: auto; width: 1600px; transform: translateX(-50%);
-      -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
-              mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent); }
-  }
   .hero__media img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 80%; border-radius: 0; box-shadow: none; }
   .hero__media::after { content: ''; position: absolute; inset: 0; pointer-events: none;
     background: linear-gradient(180deg, rgba(33,56,99,.55) 0%, rgba(33,56,99,0) 14%, rgba(33,56,99,0) 58%, rgba(33,56,99,.75) 80%, #213863 100%); }
