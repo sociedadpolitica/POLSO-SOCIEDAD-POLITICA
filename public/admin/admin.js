@@ -56,7 +56,7 @@ const fmtDate = (d) => d ? new Date(d.length === 10 ? d + 'T12:00:00' : d.replac
 function renderLogin() {
   app.innerHTML = `
     <div class="login">
-      <div class="login__art"><img src="/static/img/logo-polso.png" alt="POLSO" style="width:140px"><div><h1>Polso<span>.</span></h1><p>Sala de redacción · Temporada XIV</p></div></div>
+      <div class="login__art"><img src="/static/img/logo-polso-circulo.png" alt="POLSO Sociedad Política UFPSO" style="width:150px"><div><h1>POLSO</h1><p>Sociedad Política UFPSO · Sala de redacción</p></div></div>
       <div class="login__form">
         <form id="login" autocomplete="on">
           <h2>Bienvenido de vuelta</h2>
@@ -85,7 +85,7 @@ function shell(active, content) {
   app.innerHTML = `
     <div class="shell">
       <nav class="side" aria-label="Panel">
-        <div class="brand"><img src="/static/img/logo-polso-sm.png" alt="" style="width:40px;margin-bottom:10px">Polso<span>.</span><small>Redacción · XIV</small></div>
+        <div class="brand"><img src="/static/img/logo-polso-sm.png" alt="" style="width:44px;margin-bottom:10px">POLSO<small>Sociedad Política UFPSO</small></div>
         <hr>
         <a href="#/" class="side__link ${active === 'home' ? 'is-on' : ''}"><i>⌂</i>Inicio</a>
         ${Object.entries(r).map(([k, d]) => `<a href="#/${k}" class="side__link ${active === k ? 'is-on' : ''}"><i>${d.icon}</i>${d.label}</a>`).join('')}
