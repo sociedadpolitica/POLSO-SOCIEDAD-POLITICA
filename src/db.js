@@ -62,6 +62,9 @@ async function migrate() {
   }
   await client.execute('CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT)');
 
+  // La foto del equipo se reemplazó por una versión enfocada: actualiza el ajuste si apunta a una anterior
+  await db.run("UPDATE settings SET value = '/static/img/equipo-xiv-nitida.jpg' WHERE key = 'hero_image' AND value LIKE '/static/img/equipo-xiv%' AND value != '/static/img/equipo-xiv-nitida.jpg'");
+
   // Tareas de mantenimiento que se ejecutan una sola vez por base de datos
   await once('_members_cleared', async () => {
     // Se vació el equipo de ejemplo para cargar el de la nueva temporada desde el panel

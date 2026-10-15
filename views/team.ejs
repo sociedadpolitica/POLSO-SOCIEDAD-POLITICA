@@ -6,7 +6,7 @@
     <p class="page-dek">Un equipo. Diferentes talentos. Un mismo propósito.</p>
   </div>
   <div class="page-hero__media">
-    <img src="<%= site.hero_image || '/static/img/equipo-xiv-foto.jpg' %>" alt="Equipo POLSO Temporada <%= site.edition %>">
+    <img src="<%= (!site.hero_image || site.hero_image.startsWith('/static/img/equipo-xiv')) ? '/static/img/equipo-xiv-nitida.jpg' : site.hero_image %>" alt="Equipo POLSO Temporada <%= site.edition %>">
   </div>
 </section>
 <% if (!groups.length) { %>

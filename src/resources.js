@@ -96,7 +96,7 @@ export const settingsSchema = [
     { name: 'edition', label: 'Temporada actual', type: 'text', default: 'XIV' },
     { name: 'tagline', label: 'Lema', type: 'text', default: 'Liderando desde la opinión' },
     { name: 'about', label: 'Quiénes somos', type: 'textarea', default: 'POLSO Sociedad Política es un medio de análisis y divulgación sobre la sociedad política, con énfasis en el desarrollo sostenible y las políticas públicas y privadas. Promovemos el pensamiento crítico, la toma de decisiones informada y la búsqueda de soluciones para el bienestar colectivo.' },
-    { name: 'hero_image', label: 'Imagen principal de portada', type: 'image', default: '/static/img/equipo-xiv-foto.jpg' },
+    { name: 'hero_image', label: 'Imagen principal de portada', type: 'image', default: '/static/img/equipo-xiv-nitida.jpg' },
     { name: 'quote', label: 'Cita de portada', type: 'textarea', default: 'La libertad nunca es otorgada voluntariamente por el opresor; debe ser exigida por el oprimido.' },
     { name: 'quote_author', label: 'Autor de la cita', type: 'text', default: 'Martin Luther King Jr.' },
   ]},
