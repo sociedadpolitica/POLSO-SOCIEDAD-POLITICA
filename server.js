@@ -3,6 +3,7 @@ import path from 'node:path';
 import { config, ROOT } from './src/config.js';
 import publicRoutes from './src/routes/public.js';
 import adminApi from './src/routes/admin-api.js';
+import { icon } from './src/icons.js';
 
 const app = express();
 app.disable('x-powered-by');
@@ -10,6 +11,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(ROOT, 'views'));
 app.set('trust proxy', 1);
 app.locals.v = Date.now().toString(36); // cache-busting de CSS/JS en cada despliegue
+app.locals.icon = icon; // íconos disponibles en todas las plantillas (también en la 404)
 
 app.use((_req, res, next) => {
   res.set({ 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'strict-origin-when-cross-origin', 'X-Frame-Options': 'SAMEORIGIN' });

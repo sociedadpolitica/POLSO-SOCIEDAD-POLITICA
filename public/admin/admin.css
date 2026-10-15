@@ -174,3 +174,7 @@ textarea.input { min-height: 96px; resize: vertical; }
 .author-card small { color: var(--muted); }
 .author-card p { margin: 6px 0 0; font-size: 13.5px; color: var(--ink-2); }
 .author-card a { color: var(--blue); font-weight: 600; }
+
+/* Íconos de línea en el menú y el inicio */
+.side__link i svg { width: 19px; height: 19px; display: block; margin: 0 auto; }
+.stat i svg { width: 24px; height: 24px; }

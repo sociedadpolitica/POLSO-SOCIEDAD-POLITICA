@@ -2,7 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import crypto from 'node:crypto';
 import { db, uniqueSlug, getSettings, saveSettings, ready } from '../db.js';
-import { resources, settingsSchema } from '../resources.js';
+import { resources, settingsSchema, adminIcons } from '../resources.js';
 import { saveImage, deleteImage } from '../storage.js';
 import { runWixImport } from '../services/wix-import.js';
 import { optimizeExistingImages } from '../services/optimize-images.js';
@@ -33,7 +33,7 @@ router.get('/me', (req, res) => res.json({ authenticated: isAdmin(req) }));
 router.use(requireAdmin);
 
 // ── Esquema (alimenta los formularios del panel) ─────────
-router.get('/schema', (_req, res) => res.json({ resources, settings: settingsSchema }));
+router.get('/schema', (_req, res) => res.json({ resources, settings: settingsSchema, icons: adminIcons }));
 
 router.get('/stats', ah(async (_req, res) => {
   const counts = {};

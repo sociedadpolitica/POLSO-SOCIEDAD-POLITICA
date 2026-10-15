@@ -3,15 +3,16 @@ import { db, getSettings, ready } from '../db.js';
 import { renderRich, readingTime, embedUrl } from '../markdown.js';
 import { getLatestPost } from '../services/instagram.js';
 import { AREAS } from '../resources.js';
+import { icon, AREA_ICONS } from '../icons.js';
 
 const AREA_INFO = {
-  'Dirección': { icon: '★', text: 'Lidera la línea editorial y el rumbo de cada temporada.' },
-  'Televisión': { icon: '◉', text: 'Producción audiovisual, presentación y cubrimiento en cámara.' },
-  'Radio': { icon: '◖', text: 'Podcast, entrevistas y la voz de POLSO al aire.' },
-  'Redes sociales': { icon: '✦', text: 'La conversación diaria con nuestra comunidad digital.' },
-  'Diseño gráfico': { icon: '◆', text: 'La identidad visual detrás de cada pieza.' },
-  'Sitio web': { icon: '⌘', text: 'Esta plataforma y todo lo que vive en ella.' },
-  'Docente': { icon: '◎', text: 'Acompañamiento académico del proyecto.' },
+  'Dirección': { text: 'Lidera la línea editorial y el rumbo de cada temporada.' },
+  'Televisión': { text: 'Producción audiovisual, presentación y cubrimiento en cámara.' },
+  'Radio': { text: 'Podcast, entrevistas y la voz de POLSO al aire.' },
+  'Redes sociales': { text: 'La conversación diaria con nuestra comunidad digital.' },
+  'Diseño gráfico': { text: 'La identidad visual detrás de cada pieza.' },
+  'Sitio web': { text: 'Esta plataforma y todo lo que vive en ella.' },
+  'Docente': { text: 'Acompañamiento académico del proyecto.' },
 };
 
 const DAYS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
@@ -28,7 +29,7 @@ function radioStatus(site) {
 
 async function teamByArea() {
   const all = await db.all('SELECT * FROM members ORDER BY position, id');
-  return AREAS.map((area) => ({ area, ...AREA_INFO[area], members: all.filter((m) => m.area === area) })).filter((g) => g.members.length);
+  return AREAS.map((area) => ({ area, ...AREA_INFO[area], icon: icon(AREA_ICONS[area]), members: all.filter((m) => m.area === area) })).filter((g) => g.members.length);
 }
 
 const router = express.Router();

@@ -87,12 +87,12 @@ function shell(active, content) {
       <nav class="side" aria-label="Panel">
         <div class="brand"><img src="/static/img/logo-polso-sm.png" alt="" style="width:44px;margin-bottom:10px">POLSO<small>Sociedad Política UFPSO</small></div>
         <hr>
-        <a href="#/" class="side__link ${active === 'home' ? 'is-on' : ''}"><i>⌂</i>Inicio</a>
+        <a href="#/" class="side__link ${active === 'home' ? 'is-on' : ''}"><i>${state.schema.icons.inicio}</i>Inicio</a>
         ${Object.entries(r).map(([k, d]) => `<a href="#/${k}" class="side__link ${active === k ? 'is-on' : ''}"><i>${d.icon}</i>${d.label}</a>`).join('')}
-        <a href="#/settings" class="side__link ${active === 'settings' ? 'is-on' : ''}"><i>⚙</i>Ajustes</a>
+        <a href="#/settings" class="side__link ${active === 'settings' ? 'is-on' : ''}"><i>${state.schema.icons.ajustes}</i>Ajustes</a>
         <div class="side__spacer"></div>
-        <a href="/" target="_blank" class="side__link side__link--hide"><i>↗</i>Ver sitio</a>
-        <button class="side__link side__link--hide" data-logout><i>⎋</i>Cerrar sesión</button>
+        <a href="/" target="_blank" class="side__link side__link--hide"><i>${state.schema.icons.externo}</i>Ver sitio</a>
+        <button class="side__link side__link--hide" data-logout><i>${state.schema.icons.salir}</i>Cerrar sesión</button>
       </nav>
       <section class="main" id="main">${content}</section>
     </div>`;

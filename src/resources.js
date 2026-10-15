@@ -4,6 +4,8 @@
  *
  * Tipos de campo: text, textarea, richtext, image, url, select, number, checkbox, date
  */
+import { icon } from './icons.js';
+
 /** Áreas del equipo, en el orden en que aparecen en el sitio. */
 export const AREAS = ['Docente', 'Dirección', 'Televisión', 'Radio', 'Redes sociales', 'Diseño gráfico', 'Sitio web'];
 
@@ -11,7 +13,7 @@ export const resources = {
   articles: {
     label: 'Publicaciones',
     singular: 'Publicación',
-    icon: '✎',
+    icon: icon('publicaciones'),
     order: 'published_at DESC',
     listFields: ['cover', 'title', 'kind', 'published'],
     fields: [
@@ -37,7 +39,7 @@ export const resources = {
   members: {
     label: 'Equipo',
     singular: 'Integrante',
-    icon: '◉',
+    icon: icon('equipo'),
     order: 'position ASC, id ASC',
     listFields: ['photo', 'name', 'area'],
     fields: [
@@ -56,7 +58,7 @@ export const resources = {
   magazines: {
     label: 'Revistas',
     singular: 'Revista',
-    icon: '▤',
+    icon: icon('revistas'),
     order: 'published_at DESC',
     listFields: ['cover', 'title', 'edition'],
     fields: [
@@ -71,7 +73,7 @@ export const resources = {
   episodes: {
     label: 'Podcast',
     singular: 'Episodio',
-    icon: '◖',
+    icon: icon('podcast'),
     order: 'published_at DESC',
     listFields: ['cover', 'title', 'number'],
     fields: [
@@ -86,6 +88,9 @@ export const resources = {
 };
 
 /** Ajustes globales editables desde el panel. */
+/** Íconos fijos del menú del panel. */
+export const adminIcons = { inicio: icon('inicio'), ajustes: icon('ajustes'), externo: icon('externo'), salir: icon('salir') };
+
 export const settingsSchema = [
   { group: 'Identidad', fields: [
     { name: 'edition', label: 'Temporada actual', type: 'text', default: 'XIV' },

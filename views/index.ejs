@@ -71,11 +71,7 @@
   <div class="areas">
     <% areas.forEach((g, i) => { %>
       <a class="area reveal" href="/equipo#<%= slug(g.area) %>" style="--d:<%= i * 60 %>ms">
-        <div class="area__faces">
-          <% g.members.slice(0, 4).forEach(m => { %><% if (m.photo) { %><img src="<%= m.photo %>" alt="" loading="lazy"><% } else { %><span><%= m.name.split(' ').map(w => w[0]).slice(0, 2).join('') %></span><% } %><% }) %>
-          <% if (g.members.length > 4) { %><span>+<%= g.members.length - 4 %></span><% } %>
-        </div>
-        <span class="area__icon"><%= g.icon %></span>
+        <span class="area__icon"><%- g.icon %></span>
         <h3><%= g.area %></h3>
         <p><%= g.text %></p>
         <small><%= g.members.length %> <%= g.members.length === 1 ? 'integrante' : 'integrantes' %> ›</small>
@@ -138,9 +134,9 @@
       <h2 class="social__title">La conversación sigue en <em>@polso_oficial</em>.</h2>
       <p>Lo último que publicamos en Instagram, siempre actualizado aquí.</p>
       <div class="hero__cta">
-        <% if (site.instagram_url) { %><a class="btn btn--yellow" href="<%= site.instagram_url %>" target="_blank" rel="noopener">Seguir en Instagram</a><% } %>
-        <% if (site.facebook_url) { %><a class="btn btn--glass" href="<%= site.facebook_url %>" target="_blank" rel="noopener">Facebook</a><% } %>
-        <% if (site.youtube_url) { %><a class="btn btn--glass" href="<%= site.youtube_url %>" target="_blank" rel="noopener">YouTube</a><% } %>
+        <% if (site.instagram_url) { %><a class="btn btn--yellow" href="<%= site.instagram_url %>" target="_blank" rel="noopener"><%- icon('instagram') %>Seguir en Instagram</a><% } %>
+        <% if (site.facebook_url) { %><a class="btn btn--glass" href="<%= site.facebook_url %>" target="_blank" rel="noopener"><%- icon('facebook') %>Facebook</a><% } %>
+        <% if (site.youtube_url) { %><a class="btn btn--glass" href="<%= site.youtube_url %>" target="_blank" rel="noopener"><%- icon('youtube') %>YouTube</a><% } %>
       </div>
     </div>
     <div class="phone reveal">
