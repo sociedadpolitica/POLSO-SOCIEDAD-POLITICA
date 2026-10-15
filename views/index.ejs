@@ -22,7 +22,7 @@
   <header class="section__head reveal"><p class="eyebrow">Lo último</p><h2 class="section__title">Lo que estamos pensando.</h2></header>
   <div class="feature">
     <a class="feature__lead reveal" href="/publicaciones/<%= lead.slug %>">
-      <figure class="<%= lead.cover ? '' : 'is-author' %>"><% if (lead.cover || lead.by_photo) { %><img src="<%= lead.cover || lead.by_photo %>" alt=""><% } else { %><div class="feature__ph"><img src="/static/img/logo-polso-circulo.png" alt=""></div><% } %></figure>
+      <figure class="<%= lead.cover ? '' : 'is-author' %>"><% if (lead.cover || lead.by_photo) { %><img src="<%= lead.cover || lead.by_photo %>" alt=""><% } else { %><div class="feature__ph"><img src="/static/img/polso-logo-circulo.png" alt=""></div><% } %></figure>
       <div class="feature__text">
         <span class="tag tag--solid"><%= lead.kind %></span>
         <h3><%= lead.title %></h3>
@@ -51,7 +51,7 @@
 
 <section class="about">
   <div class="wrap about__grid">
-    <div class="about__logo reveal"><img src="/static/img/logo-polso-circulo.png" alt="Logo POLSO Sociedad Política UFPSO" loading="lazy"></div>
+    <div class="about__logo reveal"><img src="/static/img/polso-logo-circulo.png" alt="Logo POLSO Sociedad Política UFPSO" loading="lazy"></div>
     <div class="reveal">
       <p class="eyebrow eyebrow--yellow">Quiénes somos</p>
       <h2 class="about__title">Un equipo. Diferentes talentos. <em>Un mismo propósito.</em></h2>
@@ -141,7 +141,7 @@
     </div>
     <div class="phone reveal">
       <div class="phone__screen">
-        <div class="ig__head"><img src="/static/img/logo-polso-sm.png" alt=""><strong>polso_oficial</strong><span>Último post</span></div>
+        <div class="ig__head"><img src="/static/img/polso-logo-mini.png" alt=""><strong>polso_oficial</strong><span>Último post</span></div>
         <% if (instagram && instagram.mode === 'api') { %>
           <a href="<%= instagram.permalink %>" target="_blank" rel="noopener" class="ig__media"><img src="<%= instagram.image %>" alt="Último post de Instagram de POLSO" loading="lazy"><% if (instagram.isVideo) { %><span class="ig__play">▶</span><% } %></a>
           <p class="ig__caption"><strong>polso_oficial</strong> <%= instagram.caption.slice(0, 180) %><%= instagram.caption.length > 180 ? '…' : '' %></p>
@@ -152,7 +152,7 @@
           </div>
           <script async src="https://www.instagram.com/embed.js"></script>
         <% } else { %>
-          <a href="<%= site.instagram_url %>" target="_blank" rel="noopener" class="ig__media ig__media--brand"><img src="/static/img/logo-polso-circulo.png" alt=""></a>
+          <a href="<%= site.instagram_url %>" target="_blank" rel="noopener" class="ig__media ig__media--brand"><img src="/static/img/polso-logo-circulo.png" alt=""></a>
           <p class="ig__caption"><strong>polso_oficial</strong> Te presentamos al equipo de Polso y las áreas que están detrás de cada contenido. 💙</p>
         <% } %>
       </div>
