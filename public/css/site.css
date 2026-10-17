@@ -422,7 +422,7 @@ body:not(.has-hero) main { padding-top: 64px; }
 @media (max-width: 860px) {
   .burger { display: block; z-index: 2; }
   .season-pill { margin-left: auto; }
-  .nav { position: fixed; inset: 0; z-index: 1; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 0; margin: 0; padding: 96px var(--gutter) 40px; background: rgba(33,56,99,.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); opacity: 0; visibility: hidden; transition: opacity .4s var(--ease), visibility .4s; }
+  .nav { position: fixed; inset: 0; z-index: 1; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 0; margin: 0; padding: 96px var(--gutter) 40px; background: var(--navy); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); opacity: 0; visibility: hidden; transition: opacity .4s var(--ease), visibility .4s; }
   .nav.is-open { opacity: 1; visibility: visible; }
   .nav__link, .nav-wrap.is-scrolled .nav__link, body:not(.has-hero) .nav__link { padding: 14px 0; border-radius: 0; font-size: 32px; font-weight: 700; letter-spacing: -.035em; color: #fff; background: none !important; border-bottom: 1px solid rgba(255,255,255,.1); transform: translateY(12px); opacity: 0; transition: transform .5s var(--ease), opacity .5s; }
   .nav.is-open .nav__link { transform: none; opacity: 1; }
@@ -431,6 +431,11 @@ body:not(.has-hero) main { padding-top: 64px; }
   .nav__link.is-active { color: var(--yellow) !important; }
   .nav__extra { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 32px; color: rgba(255,255,255,.7); font-size: 16px; }
   body.menu-open { overflow: hidden; }
+  /* Con el menú abierto la barra pierde su desenfoque: si no, el menú (fixed) queda atrapado en sus 64 px y se superpone al contenido */
+  body.menu-open .nav-wrap { background: none !important; box-shadow: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  .nav { height: 100vh; height: 100dvh; overflow-y: auto; overscroll-behavior: contain; }
+  body.menu-open .brand__name small { color: var(--yellow) !important; }
+  body.menu-open .season-pill { visibility: hidden; }
   body.menu-open .brand { color: #fff !important; position: relative; z-index: 2; }
   body.menu-open .burger { background: rgba(255,255,255,.16) !important; }
   body.menu-open .burger span { background: #fff !important; }

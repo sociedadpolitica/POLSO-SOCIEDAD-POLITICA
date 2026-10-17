@@ -9,6 +9,7 @@
   };
   burger?.addEventListener('click', () => toggle(!nav.classList.contains('is-open')));
   document.addEventListener('keydown', (e) => e.key === 'Escape' && toggle(false));
+  nav?.addEventListener('click', (e) => e.target.closest('a') && toggle(false));
 
   const masthead = document.querySelector('[data-masthead]');
   const progress = document.querySelector('[data-progress]');
